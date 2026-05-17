@@ -6,6 +6,7 @@ class Alumno(models.Model):
     DNI = models.IntegerField()
     Ingresos= models.IntegerField()
     MontoDeuda = models.IntegerField()
+    ultimo_ingreso = models.DateTimeField(null=True, blank=True)
  
     def __str__(self): 
         return f"{self.nombre} {self.apellido}"

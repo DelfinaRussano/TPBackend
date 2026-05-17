@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Center GYM - Clientes</title>
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'css/estilos.css' %}">
+</head>
+<body>
+    <div class="topbar">
+        <div class="brand">CENTER GYM</div>
+        <div class="nav">
+            <a href="#">Dashboard</a>
+            <a href="#" style="color:#fff">Clientes</a>
+            <a href="#">Clases</a>
+            <a href="#">Profesores</a>
+            <a href="#">Planes</a>
+            <a href="#">Reclamos</a>
+        </div>
+    </div>
+
+    <div class="container">
+        <div class="card">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px">
+                <h2 style="margin:0">CLIENTES</h2>
+                <a class="btn" href="#">+ Nuevo Cliente</a>
+            </div>
+
+            <div class="controls">
+                <div class="search">
+                    <input type="text" placeholder="Buscar por nombre, email o DNI...">
+                </div>
+                <div class="muted">Mostrando {{ alumnos|length }} clientes</div>
+            </div>
+
+            <table>
+                <thead>
+                    <tr>
+                        <th>Nombre</th>
+                        <th>DNI</th>
+                        <th>Deuda</th>
+                        <th>Último ingreso</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for alumno in alumnos %}
+                    <tr>
+                        <td>{{ alumno.nombre }} {{ alumno.apellido }}</td>
+                        <td>{{ alumno.DNI }}</td>
+                        <td>${{ alumno.MontoDeuda }}</td>
+                        <td>
+                            {% if alumno.ultimo_ingreso %}
+                                {{ alumno.ultimo_ingreso|date:"d/m/Y H:i" }}
+                            {% else %}
+                                <span class="muted">(sin registro)</span>
+                            {% endif %}
+                        </td>
+                        <td class="actions">
+                            <a href="#" title="Ver">
+                                <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M15.5 14h-.79l-.28-.27A6.471 6.471 0 0 0 16 9.5 6.5 6.5 0 1 0 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zM9.5 14C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"></path></svg>
+                            </a>
+                            <a href="#" title="Editar">
+                                <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04a1.003 1.003 0 0 0 0-1.41l-2.34-2.34a1.003 1.003 0 0 0-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"></path></svg>
+                            </a>
+                            <a href="#" class="delete" title="Eliminar">
+                                <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M16 9v10H8V9h8m-1.5-6h-5l-1 1H5v2h14V4h-4.5l-1-1z"></path></svg>
+                            </a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-top:18px">
+                <div class="muted">Mostrando {{ alumnos|length }} de {{ alumnos|length }} clientes</div>
+                <div class="pagination">
+                    <div class="page">&lt;</div>
+                    <div class="page">1</div>
+                    <div class="page">2</div>
+                    <div class="page">3</div>
+                    <div class="page">&gt;</div>
+                </div>
+            </div>
+        </div>
+        <img class="logo-footer" src="./LogoAppGym.png" alt="Logo Center GYM">
+    </div>
+</body>
+</html>
+
+    

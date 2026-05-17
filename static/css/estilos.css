@@ -1,0 +1,51 @@
+.box-reset, * , *::before, *::after { box-sizing: border-box; }
+body { font-family: Arial, Helvetica, sans-serif; background:#f7f7f7; margin:0; color:#222 }
+.topbar { background:#222; color:#fff; padding:12px 20px; display:flex; align-items:center; justify-content:space-between }
+.brand { font-weight:700; letter-spacing:1px }
+.nav { display:flex; gap:18px; align-items:center }
+.nav a { color:#bbb; text-decoration:none; font-size:14px }
+/* Make container full width so the card fills the gray background area */
+/* Make the card almost full width with small side gutters */
+.container { max-width:none; width:calc(100% - 40px); margin:20px auto; padding:20px 20px 60px }
+.card { background:#fff; border-radius:8px; padding:20px; box-shadow:0 2px 8px rgba(0,0,0,0.06); overflow-x:auto }
+.controls { display:flex; justify-content:space-between; align-items:center; margin-bottom:18px }
+.search { display:flex; gap:8px; align-items:center }
+.search input { padding:10px 14px; border:1px solid #ddd; border-radius:6px; width:420px; font-size:15px }
+.btn { background:#ff8a00; color:#fff; padding:10px 14px; border-radius:6px; text-decoration:none; font-weight:600 }
+table { width:100%; border-collapse:collapse; margin-top:12px; table-layout:auto; min-width:0 }
+th, td { text-align:left; padding:16px 12px; border-bottom:1px solid #f0f0f0; font-size:16px }
+th { color:#666; font-weight:600; font-size:14px }
+.muted { color:#888; font-size:14px }
+.actions { display:flex; gap:12px }
+.pagination { display:flex; gap:8px; align-items:center; margin-top:12px }
+.page { padding:8px 12px; border:1px solid #eee; background:#fff; border-radius:4px }
+
+/* Make headings larger for emphasis */
+h2 { font-size:20px; margin:0 }
+
+/* Make table rows a bit taller */
+tbody tr { height:56px }
+
+/* Prevent overall page horizontal scrolling on large tables; allow table to scroll inside card */
+
+/* Prevent page-level horizontal scroll; allow internal card scroll */
+html, body { overflow-x: hidden; }
+
+/* leave room at the bottom for a logo area */
+body { padding-bottom: 90px }
+
+/* Footer logo centered */
+.logo-footer { position: fixed; left: 0; right: 0; bottom: 10px; display:flex; justify-content:center; pointer-events:none }
+.logo-footer img { max-height:70px; opacity:0.95 }
+
+@media (max-width: 1000px) {
+	.container { padding:16px }
+	.search input { width:100% }
+	.actions a { width:34px; height:34px }
+}
+
+/* Icon link styles in actions column */
+.actions a { color:#555; text-decoration:none; display:inline-flex; align-items:center; justify-content:center; width:36px; height:36px; border-radius:6px }
+.actions a:hover { background:#f5f5f5 }
+.actions svg { width:18px; height:18px; fill:#555 }
+.actions a.delete svg { fill:#d9534f }
