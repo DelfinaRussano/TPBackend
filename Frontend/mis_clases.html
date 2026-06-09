@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Center GYM - Mis Clases</title>
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'css/estilos.css' %}">
+</head>
+<body>
+    <div class="topbar">
+        <div class="brand">CENTER GYM</div>
+        <div class="nav">
+            <a href="{% url 'alumno:mis_clases' alumno.id %}">Mis Clases</a>
+            <a href="{% url 'alumno:mis_reclamos' alumno.id %}">Mis Reclamos</a>
+        </div>
+    </div>
+
+    <div class="container">
+        <div class="card">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px">
+                <h2 style="margin:0">📚 MIS CLASES</h2>
+                <div class="muted">Alumno: {{ alumno.nombre }} {{ alumno.apellido }}</div>
+            </div>
+
+            <div class="controls">
+                <div class="search">
+                    <form method="GET" style="display:flex; gap:8px; margin:0;">
+                        <input type="text" name="q" placeholder="Buscar clase..." value="{{ request.GET.q }}">
+                        <button type="submit" class="btn" style="background:#ff8a00; color:white; border:none; cursor:pointer;">🔍 Buscar</button>
+                    </form>
+                </div>
+                <div class="muted">{{ clases|length }} clases</div>
+            </div>
+
+            <table>
+                <thead>
+                    <tr>
+                        <th>Clase</th>
+                        <th>Días</th>
+                        <th>Horario</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for clase in clases %}
+                    <tr>
+                        <td><strong>{{ clase.nombre }}</strong></td>
+                        <td>{{ clase.dias }}</td>
+                        <td>{{ clase.horario }}</td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="3" style="text-align:center; color:#888; padding:40px;">No estás inscripto en ninguna clase.</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        <img class="logo-footer" src="/static/LogoAppGym.png" alt="Logo Center GYM">
+    </div>
+</body>
+</html>

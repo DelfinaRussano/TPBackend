@@ -46,3 +46,6 @@ tbody tr:hover { background:#f8f9fb; }
 .page-dots { color:#999; padding:0 6px; }
 .table-summary { margin-top:14px; color:#666; font-size:14px; }
 .actions a.delete svg { fill:#d9534f }
+
+.app-footer { display:flex; justify-content:center; align-items:center; padding:24px 0 32px; background:#fff; }
+.app-footer img { max-height:60px; width:auto; }
