@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Center GYM - Admin</title>
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'css/estilos.css' %}">
+</head>
+<body>
+    <header class="topbar">
+        <div class="brand">CENTER GYM</div>
+        <div class="topbar-actions">
+            <span class="user-label">Admin ▾</span>
+            <a href="#" class="logout-link">Cerrar</a>
+        </div>
+    </header>
+
+    <nav class="main-nav">
+        <a href="#" class="nav-link" data-tab="dashboard">DASHBOARD</a>
+        <a href="#" class="nav-link active" data-tab="clientes">CLIENTES</a>
+        <a href="#" class="nav-link" data-tab="clases">CLASES</a>
+        <a href="#" class="nav-link" data-tab="profesores">PROFESORES</a>
+        <a href="#" class="nav-link" data-tab="planes">PLANES</a>
+        <a href="#" class="nav-link" data-tab="reclamos">RECLAMOS</a>
+    </nav>
+
+    <main class="page-content">
+        <section class="tab-panel" id="dashboard">
+            <section class="page-header">
+                <h1>Dashboard</h1>
+            </section>
+            <section class="card">
+                <div class="card-controls">
+                    <div class="search">
+                        <span class="search-icon">📊</span>
+                        <input type="text" placeholder="Resumen general" disabled>
+                    </div>
+                </div>
+                <div class="dashboard-grid">
+                    <div class="stat-card">
+                        <strong>{{ alumnos|length }}</strong>
+                        <span>Clientes</span>
+                    </div>
+                    <div class="stat-card">
+                        <strong>{{ clases|length }}</strong>
+                        <span>Clases</span>
+                    </div>
+                    <div class="stat-card">
+                        <strong>{{ profesores|length }}</strong>
+                        <span>Profesores</span>
+                    </div>
+                    <div class="stat-card">
+                        <strong>{{ planes|length }}</strong>
+                        <span>Planes</span>
+                    </div>
+                    <div class="stat-card">
+                        <strong>{{ reclamos|length }}</strong>
+                        <span>Reclamos</span>
+                    </div>
+                </div>
+            </section>
+        </section>
+
+        <section class="tab-panel active" id="clientes">
+            <section class="page-header">
+                <h1>CLIENTES</h1>
+                <a href="#" class="btn btn-primary">+ Nuevo Cliente</a>
+            </section>
+            <section class="card">
+                <div class="card-controls">
+                    <div class="search">
+                        <span class="search-icon">🔍</span>
+                        <input type="text" placeholder="Buscar por nombre, email o DNI...">
+                    </div>
+                </div>
+                <div class="table-wrap">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>NOMBRE</th>
+                                <th>DNI</th>
+                                <th>INGRESOS</th>
+                                <th>DEUDA</th>
+                                <th>ULTIMO INGRESO</th>
+                                <th>ACCIONES</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for alumno in alumnos %}
+                                <tr>
+                                    <td>{{ alumno.nombre }} {{ alumno.apellido }}</td>
+                                    <td>{{ alumno.DNI }}</td>
+                                    <td>{{ alumno.Ingresos }}</td>
+                                    <td>{{ alumno.MontoDeuda }}</td>
+                                    <td>{{ alumno.ultimo_ingreso|date:'d/m/Y H:i' }}</td>
+                                    <td class="actions">
+                                        <a href="#" title="Ver">👁️</a>
+                                        <a href="#" title="Editar">✏️</a>
+                                        <a href="#" title="Eliminar" class="delete">🗑️</a>
+                                    </td>
+                                </tr>
+                            {% empty %}
+                                <tr>
+                                    <td colspan="6">No hay clientes registrados.</td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                <div class="pagination">
+                    <button class="page">&lt;</button>
+                    <button class="page active">1</button>
+                    <button class="page">2</button>
+                    <button class="page">3</button>
+                    <span class="page-dots">...</span>
+                    <button class="page">&gt;</button>
+                </div>
+                <p class="table-summary">Mostrando {{ alumnos|length }} cliente(s)</p>
+            </section>
+        </section>
+
+        <section class="tab-panel" id="clases">
+            <section class="page-header">
+                <h1>CLASES</h1>
+                <a href="#" class="btn btn-primary">+ Nueva Clase</a>
+            </section>
+            <section class="card">
+                <div class="table-wrap">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>NOMBRE</th>
+                                <th>DÍAS</th>
+                                <th>HORARIO</th>
+                                <th>ALUMNOS</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for clase in clases %}
+                                <tr>
+                                    <td>{{ clase.nombre }}</td>
+                                    <td>{{ clase.dias }}</td>
+                                    <td>{{ clase.horario }}</td>
+                                    <td>{{ clase.alumnos.count }}</td>
+                                </tr>
+                            {% empty %}
+                                <tr>
+                                    <td colspan="4">No hay clases registradas.</td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                <p class="table-summary">Mostrando {{ clases|length }} clase(s)</p>
+            </section>
+        </section>
+
+        <section class="tab-panel" id="profesores">
+            <section class="page-header">
+                <h1>PROFESORES</h1>
+                <a href="#" class="btn btn-primary">+ Nuevo Profesor</a>
+            </section>
+            <section class="card">
+                <div class="table-wrap">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>NOMBRE</th>
+                                <th>APELLIDO</th>
+                                <th>CLASES</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for profesor in profesores %}
+                                <tr>
+                                    <td>{{ profesor.nombre }}</td>
+                                    <td>{{ profesor.apellido }}</td>
+                                    <td>{{ profesor.clases.all|join:", " }}</td>
+                                </tr>
+                            {% empty %}
+                                <tr>
+                                    <td colspan="3">No hay profesores registrados.</td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                <p class="table-summary">Mostrando {{ profesores|length }} profesor(es)</p>
+            </section>
+        </section>
+
+        <section class="tab-panel" id="planes">
+            <section class="page-header">
+                <h1>PLANES</h1>
+                <a href="#" class="btn btn-primary">+ Nuevo Plan</a>
+            </section>
+            <section class="card">
+                <div class="table-wrap">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>NOMBRE</th>
+                                <th>PRECIO</th>
+                                <th>DURACIÓN</th>
+                                <th>DESCRIPCIÓN</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for plan in planes %}
+                                <tr>
+                                    <td>{{ plan.nombre }}</td>
+                                    <td>${{ plan.precio }}</td>
+                                    <td>{{ plan.duracion }}</td>
+                                    <td>{{ plan.descripcion|truncatechars:60 }}</td>
+                                </tr>
+                            {% empty %}
+                                <tr>
+                                    <td colspan="4">No hay planes registrados.</td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                <p class="table-summary">Mostrando {{ planes|length }} plan(es)</p>
+            </section>
+        </section>
+
+        <section class="tab-panel" id="reclamos">
+            <section class="page-header">
+                <h1>RECLAMOS</h1>
+                <a href="#" class="btn btn-primary">+ Nuevo Reclamo</a>
+            </section>
+            <section class="card">
+                <div class="table-wrap">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>ALUMNO</th>
+                                <th>ESTADO</th>
+                                <th>FECHA</th>
+                                <th>RESOLUCIÓN</th>
+                                <th>CONTENIDO</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for reclamo in reclamos %}
+                                <tr>
+                                    <td>{{ reclamo.alumno }}</td>
+                                    <td>{{ reclamo.estado }}</td>
+                                    <td>{{ reclamo.fecha_reclamo|date:'d/m/Y H:i' }}</td>
+                                    <td>{% if reclamo.fecha_resolucion %}{{ reclamo.fecha_resolucion|date:'d/m/Y H:i' }}{% else %}-{% endif %}</td>
+                                    <td>{{ reclamo.contenido|truncatechars:80 }}</td>
+                                </tr>
+                            {% empty %}
+                                <tr>
+                                    <td colspan="5">No hay reclamos registrados.</td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                <p class="table-summary">Mostrando {{ reclamos|length }} reclamo(s)</p>
+            </section>
+        </section>
+    </main>
+
+    <script>
+        const navLinks = document.querySelectorAll('.nav-link');
+        const panels = document.querySelectorAll('.tab-panel');
+
+        navLinks.forEach(link => {
+            link.addEventListener('click', event => {
+                event.preventDefault();
+                const target = link.dataset.tab;
+
+                navLinks.forEach(nav => nav.classList.remove('active'));
+                link.classList.add('active');
+
+                panels.forEach(panel => {
+                    panel.classList.toggle('active', panel.id === target);
+                });
+            });
+        });
+    </script>
+</body>
+</html>
