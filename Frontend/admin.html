@@ -17,62 +17,49 @@
     </header>
 
     <nav class="main-nav">
-        <a href="#" class="nav-link" data-tab="dashboard">DASHBOARD</a>
-        <a href="#" class="nav-link active" data-tab="clientes">CLIENTES</a>
-        <a href="#" class="nav-link" data-tab="clases">CLASES</a>
-        <a href="#" class="nav-link" data-tab="profesores">PROFESORES</a>
-        <a href="#" class="nav-link" data-tab="planes">PLANES</a>
-        <a href="#" class="nav-link" data-tab="reclamos">RECLAMOS</a>
+        <a href="#" class="nav-link{% if active_tab == 'clientes' %} active{% endif %}" data-tab="clientes">CLIENTES</a>
+        <a href="#" class="nav-link{% if active_tab == 'clases' %} active{% endif %}" data-tab="clases">CLASES</a>
+        <a href="#" class="nav-link{% if active_tab == 'profesores' %} active{% endif %}" data-tab="profesores">PROFESORES</a>
+        <a href="#" class="nav-link{% if active_tab == 'planes' %} active{% endif %}" data-tab="planes">PLANES</a>
+        <a href="#" class="nav-link{% if active_tab == 'reclamos' %} active{% endif %}" data-tab="reclamos">RECLAMOS</a>
     </nav>
 
-    <main class="page-content">
-        <section class="tab-panel" id="dashboard">
-            <section class="page-header">
-                <h1>Dashboard</h1>
-            </section>
-            <section class="card">
-                <div class="card-controls">
-                    <div class="search">
-                        <span class="search-icon">📊</span>
-                        <input type="text" placeholder="Resumen general" disabled>
-                    </div>
-                </div>
-                <div class="dashboard-grid">
-                    <div class="stat-card">
-                        <strong>{{ alumnos|length }}</strong>
-                        <span>Clientes</span>
-                    </div>
-                    <div class="stat-card">
-                        <strong>{{ clases|length }}</strong>
-                        <span>Clases</span>
-                    </div>
-                    <div class="stat-card">
-                        <strong>{{ profesores|length }}</strong>
-                        <span>Profesores</span>
-                    </div>
-                    <div class="stat-card">
-                        <strong>{{ planes|length }}</strong>
-                        <span>Planes</span>
-                    </div>
-                    <div class="stat-card">
-                        <strong>{{ reclamos|length }}</strong>
-                        <span>Reclamos</span>
-                    </div>
-                </div>
-            </section>
-        </section>
 
-        <section class="tab-panel active" id="clientes">
+    <div id="messageModal" class="modal" style="display: none;">
+        <div class="modal-content">
+            <div id="modalMessage" class="modal-text"></div>
+            <button onclick="closeModal()" class="btn btn-primary">OK</button>
+        </div>
+    </div>
+
+    <div id="detailModal" class="modal" style="display: none;">
+        <div class="modal-content modal-content-detail">
+            <h2 id="detailModalTitle" class="modal-title"></h2>
+            <div id="detailModalBody" class="modal-detail-body"></div>
+            <button onclick="closeDetailModal()" class="btn btn-primary">OK</button>
+        </div>
+    </div>
+
+
+    {% if messages %}
+        {% for message in messages %}
+            <div data-message="{{ message }}" style="display: none;"></div>
+        {% endfor %}
+    {% endif %}
+
+    <main class="page-content">
+        <section class="tab-panel{% if active_tab == 'clientes' %} active{% endif %}" id="clientes">
             <section class="page-header">
                 <h1>CLIENTES</h1>
-                <a href="#" class="btn btn-primary">+ Nuevo Cliente</a>
+                <a href="{% url 'alumno:crear_alumno' %}" class="btn btn-primary">+ Nuevo Cliente</a>
             </section>
             <section class="card">
                 <div class="card-controls">
-                    <div class="search">
+                    <form method="get" class="search" action="">
                         <span class="search-icon">🔍</span>
-                        <input type="text" placeholder="Buscar por nombre, email o DNI...">
-                    </div>
+                        <input type="text" name="q" placeholder="Buscar por nombre, email o DNI..." value="{{ q_alumnos }}">
+                        <button type="submit" class="btn">Buscar</button>
+                    </form>
                 </div>
                 <div class="table-wrap">
                     <table>
@@ -88,16 +75,21 @@
                         </thead>
                         <tbody>
                             {% for alumno in alumnos %}
-                                <tr>
+                                <tr class="clickable-row" data-view-type="alumno"
+                                    data-nombre="{{ alumno.nombre }}"
+                                    data-apellido="{{ alumno.apellido }}"
+                                    data-dni="{{ alumno.DNI }}"
+                                    data-ingresos="{{ alumno.Ingresos }}"
+                                    data-deuda="{{ alumno.MontoDeuda }}"
+                                    data-ultimo-ingreso="{% if alumno.ultimo_ingreso %}{{ alumno.ultimo_ingreso|date:'d/m/Y H:i' }}{% else %}-{% endif %}"
+                                    data-clases="{% for clase in alumno.clases.all %}{{ clase.nombre }} ({{ clase.dias }} — {{ clase.horario }}){% if not forloop.last %}|||{% endif %}{% endfor %}">
                                     <td>{{ alumno.nombre }} {{ alumno.apellido }}</td>
                                     <td>{{ alumno.DNI }}</td>
                                     <td>{{ alumno.Ingresos }}</td>
                                     <td>{{ alumno.MontoDeuda }}</td>
-                                    <td>{{ alumno.ultimo_ingreso|date:'d/m/Y H:i' }}</td>
+                                    <td>{% if alumno.ultimo_ingreso %}{{ alumno.ultimo_ingreso|date:'d/m/Y H:i' }}{% else %}-{% endif %}</td>
                                     <td class="actions">
-                                        <a href="#" title="Ver">👁️</a>
                                         <a href="#" title="Editar">✏️</a>
-                                        <a href="#" title="Eliminar" class="delete">🗑️</a>
                                     </td>
                                 </tr>
                             {% empty %}
@@ -116,15 +108,16 @@
                     <span class="page-dots">...</span>
                     <button class="page">&gt;</button>
                 </div>
-                <p class="table-summary">Mostrando {{ alumnos|length }} cliente(s)</p>
+                <p class="table-summary">Mostrando {{ alumnos|length }} cliente(s) — hacé clic en una fila para ver el detalle</p>
             </section>
         </section>
 
-        <section class="tab-panel" id="clases">
+        <section class="tab-panel{% if active_tab == 'clases' %} active{% endif %}" id="clases">
             <section class="page-header">
                 <h1>CLASES</h1>
-                <a href="#" class="btn btn-primary">+ Nueva Clase</a>
+                <button type="button" id="toggleClaseFormBtn" class="btn btn-primary">+ Nueva Clase</button>
             </section>
+
             <section class="card">
                 <div class="table-wrap">
                     <table>
@@ -134,33 +127,47 @@
                                 <th>DÍAS</th>
                                 <th>HORARIO</th>
                                 <th>ALUMNOS</th>
+                                <th>ACCIONES</th>
                             </tr>
                         </thead>
                         <tbody>
                             {% for clase in clases %}
-                                <tr>
+                                <tr class="clickable-row" data-view-type="clase"
+                                    data-nombre="{{ clase.nombre }}"
+                                    data-dias="{{ clase.dias }}"
+                                    data-horario="{{ clase.horario }}"
+                                    data-alumnos-count="{{ clase.alumnos.count }}"
+                                    data-alumnos="{% for alumno in clase.alumnos.all %}{{ alumno.nombre }} {{ alumno.apellido }}{% if not forloop.last %}|||{% endif %}{% endfor %}">
                                     <td>{{ clase.nombre }}</td>
                                     <td>{{ clase.dias }}</td>
                                     <td>{{ clase.horario }}</td>
                                     <td>{{ clase.alumnos.count }}</td>
+                                    <td class="actions">
+                                        <a href="#" class="edit-clase-btn" title="Editar"
+                                           data-id="{{ clase.id }}"
+                                           data-nombre="{{ clase.nombre }}"
+                                           data-dias="{{ clase.dias }}"
+                                           data-horario="{{ clase.horario }}">✏️</a>
+                                    </td>
                                 </tr>
                             {% empty %}
                                 <tr>
-                                    <td colspan="4">No hay clases registradas.</td>
+                                    <td colspan="5">No hay clases registradas.</td>
                                 </tr>
                             {% endfor %}
                         </tbody>
                     </table>
                 </div>
-                <p class="table-summary">Mostrando {{ clases|length }} clase(s)</p>
+                <p class="table-summary">Mostrando {{ clases|length }} clase(s) — hacé clic en una fila para ver el detalle</p>
             </section>
         </section>
 
-        <section class="tab-panel" id="profesores">
+        <section class="tab-panel{% if active_tab == 'profesores' %} active{% endif %}" id="profesores">
             <section class="page-header">
                 <h1>PROFESORES</h1>
-                <a href="#" class="btn btn-primary">+ Nuevo Profesor</a>
+                <button type="button" id="toggleProfesorFormBtn" class="btn btn-primary">+ Nuevo Profesor</button>
             </section>
+
             <section class="card">
                 <div class="table-wrap">
                     <table>
@@ -169,32 +176,52 @@
                                 <th>NOMBRE</th>
                                 <th>APELLIDO</th>
                                 <th>CLASES</th>
+                                <th>ACCIONES</th>
                             </tr>
                         </thead>
                         <tbody>
                             {% for profesor in profesores %}
-                                <tr>
+                                <tr class="clickable-row" data-view-type="profesor"
+                                    data-nombre="{{ profesor.nombre }}"
+                                    data-apellido="{{ profesor.apellido }}"
+                                    data-clases="{% for clase in profesor.clases.all %}{{ clase.nombre }} ({{ clase.dias }} — {{ clase.horario }}){% if not forloop.last %}|||{% endif %}{% endfor %}">
                                     <td>{{ profesor.nombre }}</td>
                                     <td>{{ profesor.apellido }}</td>
-                                    <td>{{ profesor.clases.all|join:", " }}</td>
+                                    <td>
+                                        {% if profesor.clases.exists %}
+                                            {% for clase in profesor.clases.all %}
+                                                {{ clase.nombre }} ({{ clase.horario }}){% if not forloop.last %}, {% endif %}
+                                            {% endfor %}
+                                        {% else %}
+                                            -
+                                        {% endif %}
+                                    </td>
+                                    <td class="actions">
+                                        <a href="#" class="edit-profesor-btn" title="Editar"
+                                           data-id="{{ profesor.id }}"
+                                           data-nombre="{{ profesor.nombre }}"
+                                           data-apellido="{{ profesor.apellido }}"
+                                           data-clases="{% for c in profesor.clases.all %}{{ c.id }}{% if not forloop.last %},{% endif %}{% endfor %}">✏️</a>
+                                    </td>
                                 </tr>
                             {% empty %}
                                 <tr>
-                                    <td colspan="3">No hay profesores registrados.</td>
+                                    <td colspan="4">No hay profesores registrados.</td>
                                 </tr>
                             {% endfor %}
                         </tbody>
                     </table>
                 </div>
-                <p class="table-summary">Mostrando {{ profesores|length }} profesor(es)</p>
+                <p class="table-summary">Mostrando {{ profesores|length }} profesor(es) — hacé clic en una fila para ver el detalle</p>
             </section>
         </section>
 
-        <section class="tab-panel" id="planes">
+        <section class="tab-panel{% if active_tab == 'planes' %} active{% endif %}" id="planes">
             <section class="page-header">
                 <h1>PLANES</h1>
-                <a href="#" class="btn btn-primary">+ Nuevo Plan</a>
+                <button type="button" id="togglePlanFormBtn" class="btn btn-primary">+ Nuevo Plan</button>
             </section>
+
             <section class="card">
                 <div class="table-wrap">
                     <table>
@@ -204,32 +231,44 @@
                                 <th>PRECIO</th>
                                 <th>DURACIÓN</th>
                                 <th>DESCRIPCIÓN</th>
+                                <th>ACCIONES</th>
                             </tr>
                         </thead>
                         <tbody>
                             {% for plan in planes %}
-                                <tr>
+                                <tr class="clickable-row" data-view-type="plan"
+                                    data-nombre="{{ plan.nombre }}"
+                                    data-precio="{{ plan.precio }}"
+                                    data-duracion="{{ plan.duracion }}"
+                                    data-descripcion="{{ plan.descripcion }}">
                                     <td>{{ plan.nombre }}</td>
                                     <td>${{ plan.precio }}</td>
                                     <td>{{ plan.duracion }}</td>
                                     <td>{{ plan.descripcion|truncatechars:60 }}</td>
+                                    <td class="actions">
+                                        <a href="#" class="edit-plan-btn" title="Editar"
+                                           data-id="{{ plan.id }}"
+                                           data-nombre="{{ plan.nombre }}"
+                                           data-precio="{{ plan.precio }}"
+                                           data-duracion="{{ plan.duracion }}"
+                                           data-descripcion="{{ plan.descripcion }}">✏️</a>
+                                    </td>
                                 </tr>
                             {% empty %}
                                 <tr>
-                                    <td colspan="4">No hay planes registrados.</td>
+                                    <td colspan="5">No hay planes registrados.</td>
                                 </tr>
                             {% endfor %}
                         </tbody>
                     </table>
                 </div>
-                <p class="table-summary">Mostrando {{ planes|length }} plan(es)</p>
+                <p class="table-summary">Mostrando {{ planes|length }} plan(es) — hacé clic en una fila para ver el detalle</p>
             </section>
         </section>
 
-        <section class="tab-panel" id="reclamos">
+        <section class="tab-panel{% if active_tab == 'reclamos' %} active{% endif %}" id="reclamos">
             <section class="page-header">
                 <h1>RECLAMOS</h1>
-                <a href="#" class="btn btn-primary">+ Nuevo Reclamo</a>
             </section>
             <section class="card">
                 <div class="table-wrap">
@@ -265,27 +304,405 @@
         </section>
     </main>
 
+    <div id="claseFormModal" class="modal form-modal" style="display: {% if show_clase_form %}flex{% else %}none{% endif %};">
+        <div class="modal-content">
+            <h2 class="modal-title" id="claseFormTitle">{% if clase_edit_id %}Editar Clase{% else %}Nueva Clase{% endif %}</h2>
+            <form method="post" class="form-card" id="claseForm">
+                {% csrf_token %}
+                <input type="hidden" name="action" id="clase-action" value="{% if clase_edit_id %}editar_clase{% else %}crear_clase{% endif %}">
+                <input type="hidden" name="clase_id" id="clase-id" value="{{ clase_edit_id|default:'' }}">
+                <div class="form-group">
+                    <label for="clase-nombre">Nombre</label>
+                    <input type="text" id="clase-nombre" name="nombre" value="{{ clase_form.nombre|default:'' }}" required>
+                </div>
+                <div class="form-group">
+                    <label for="clase-dias">Días</label>
+                    <input type="text" id="clase-dias" name="dias" value="{{ clase_form.dias|default:'' }}">
+                </div>
+                <div class="form-group">
+                    <label for="clase-horario">Horario</label>
+                    <input type="text" id="clase-horario" name="horario" value="{{ clase_form.horario|default:'' }}">
+                </div>
+                <div class="form-actions">
+                    <button type="submit" class="btn btn-primary" id="claseSubmitBtn">{% if clase_edit_id %}Guardar Cambios{% else %}Crear Clase{% endif %}</button>
+                    <button type="button" id="cancelClaseFormBtn" class="btn btn-secondary">Cancelar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div id="profesorFormModal" class="modal form-modal" style="display: {% if show_profesor_form %}flex{% else %}none{% endif %};">
+        <div class="modal-content">
+            <h2 class="modal-title" id="profesorFormTitle">{% if profesor_edit_id %}Editar Profesor{% else %}Nuevo Profesor{% endif %}</h2>
+            <form method="post" class="form-card" id="profesorForm">
+                {% csrf_token %}
+                <input type="hidden" name="action" id="profesor-action" value="{% if profesor_edit_id %}editar_profesor{% else %}crear_profesor{% endif %}">
+                <input type="hidden" name="profesor_id" id="profesor-id" value="{{ profesor_edit_id|default:'' }}">
+                <div class="form-group">
+                    <label for="profesor-nombre">Nombre</label>
+                    <input type="text" id="profesor-nombre" name="nombre" value="{{ profesor_form.nombre|default:'' }}" required>
+                </div>
+                <div class="form-group">
+                    <label for="profesor-apellido">Apellido</label>
+                    <input type="text" id="profesor-apellido" name="apellido" value="{{ profesor_form.apellido|default:'' }}" required>
+                </div>
+                <div class="form-group">
+                    <label for="profesor-clases">Clases (seleccioná una o más)</label>
+                    <select id="profesor-clases" name="clases" multiple size="6">
+                        {% for clase in clases %}
+                            <option value="{{ clase.id }}" {% if clase.id in profesor_form.clases_ids %}selected{% endif %}>
+                                {{ clase.nombre }} — {{ clase.horario }}
+                            </option>
+                        {% empty %}
+                            <option disabled>No hay clases</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="form-actions">
+                    <button type="submit" class="btn btn-primary" id="profesorSubmitBtn">{% if profesor_edit_id %}Guardar Cambios{% else %}Crear Profesor{% endif %}</button>
+                    <button type="button" id="cancelProfesorFormBtn" class="btn btn-secondary">Cancelar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div id="planFormModal" class="modal form-modal" style="display: {% if show_plan_form %}flex{% else %}none{% endif %};">
+        <div class="modal-content">
+            <h2 class="modal-title" id="planFormTitle">{% if plan_edit_id %}Editar Plan{% else %}Nuevo Plan{% endif %}</h2>
+            <form method="post" class="form-card" id="planForm">
+                {% csrf_token %}
+                <input type="hidden" name="action" id="plan-action" value="{% if plan_edit_id %}editar_plan{% else %}crear_plan{% endif %}">
+                <input type="hidden" name="plan_id" id="plan-id" value="{{ plan_edit_id|default:'' }}">
+                <div class="form-group">
+                    <label for="plan-nombre">Nombre</label>
+                    <input type="text" id="plan-nombre" name="nombre" value="{{ plan_form.nombre|default:'' }}" required>
+                </div>
+                <div class="form-group">
+                    <label for="plan-precio">Precio</label>
+                    <input type="text" id="plan-precio" name="precio" value="{{ plan_form.precio|default:'' }}" required>
+                </div>
+                <div class="form-group">
+                    <label for="plan-duracion">Duración</label>
+                    <input type="text" id="plan-duracion" name="duracion" value="{{ plan_form.duracion|default:'' }}" required>
+                </div>
+                <div class="form-group">
+                    <label for="plan-descripcion">Descripción</label>
+                    <textarea id="plan-descripcion" name="descripcion" rows="4">{{ plan_form.descripcion|default:'' }}</textarea>
+                </div>
+                <div class="form-actions">
+                    <button type="submit" class="btn btn-primary" id="planSubmitBtn">{% if plan_edit_id %}Guardar Cambios{% else %}Crear Plan{% endif %}</button>
+                    <button type="button" id="cancelPlanFormBtn" class="btn btn-secondary">Cancelar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
     <footer class="app-footer">
         <img src="{% static 'images/LogoAppGym.png' %}" alt="Logo App Gym">
     </footer>
 
     <script>
+    document.addEventListener('DOMContentLoaded', function() {
         const navLinks = document.querySelectorAll('.nav-link');
         const panels = document.querySelectorAll('.tab-panel');
+
+        function activateTab(targetId) {
+            navLinks.forEach(nav => nav.classList.toggle('active', nav.dataset.tab === targetId));
+            panels.forEach(panel => panel.classList.toggle('active', panel.id === targetId));
+        }
+
+        const urlParams = new URLSearchParams(window.location.search);
+        const initial = urlParams.get('tab')
+            || document.querySelector('.nav-link.active')?.dataset.tab
+            || (navLinks[0] && navLinks[0].dataset.tab);
+        if (initial) activateTab(initial);
 
         navLinks.forEach(link => {
             link.addEventListener('click', event => {
                 event.preventDefault();
                 const target = link.dataset.tab;
-
-                navLinks.forEach(nav => nav.classList.remove('active'));
-                link.classList.add('active');
-
-                panels.forEach(panel => {
-                    panel.classList.toggle('active', panel.id === target);
-                });
+                activateTab(target);
             });
         });
+
+        function initEntityForm(config) {
+            const modal = document.getElementById(config.modalId);
+            const toggleBtn = document.getElementById(config.toggleBtnId);
+            const cancelBtn = document.getElementById(config.cancelBtnId);
+            const form = document.getElementById(config.formId);
+            const actionInput = document.getElementById(config.actionInputId);
+            const idInput = document.getElementById(config.idInputId);
+            const titleEl = document.getElementById(config.titleId);
+            const submitBtn = document.getElementById(config.submitBtnId);
+
+            if (!modal || !form) return;
+
+            function resetCreateForm() {
+                actionInput.value = config.createAction;
+                idInput.value = '';
+                if (titleEl) titleEl.textContent = config.createTitle;
+                if (submitBtn) submitBtn.textContent = config.submitCreateText;
+                config.fields.forEach(field => {
+                    const input = form.querySelector(`[name="${field.name}"]`);
+                    if (!input) return;
+                    if (field.type === 'multiselect') {
+                        Array.from(input.options).forEach(option => {
+                            option.selected = false;
+                        });
+                    } else {
+                        input.value = '';
+                    }
+                });
+            }
+
+            function closeModalForm() {
+                modal.style.display = 'none';
+                resetCreateForm();
+            }
+
+            function setFormMode(mode, data) {
+                activateTab(config.tab);
+                modal.style.display = 'flex';
+
+                const isEdit = mode === 'edit';
+                actionInput.value = isEdit ? config.editAction : config.createAction;
+                idInput.value = isEdit ? (data.id || '') : '';
+
+                if (titleEl) titleEl.textContent = isEdit ? config.editTitle : config.createTitle;
+                if (submitBtn) submitBtn.textContent = isEdit ? 'Guardar Cambios' : config.submitCreateText;
+
+                config.fields.forEach(field => {
+                    const input = form.querySelector(`[name="${field.name}"]`);
+                    if (!input) return;
+
+                    if (field.type === 'multiselect') {
+                        const selected = (data[field.name] || '').split(',').filter(Boolean);
+                        Array.from(input.options).forEach(option => {
+                            option.selected = selected.includes(option.value);
+                        });
+                    } else {
+                        input.value = isEdit ? (data[field.name] || '') : '';
+                    }
+                });
+            }
+
+            if (toggleBtn) {
+                toggleBtn.addEventListener('click', () => {
+                    if (modal.style.display === 'flex' && !idInput.value) {
+                        closeModalForm();
+                    } else {
+                        resetCreateForm();
+                        modal.style.display = 'flex';
+                    }
+                });
+            }
+
+            if (cancelBtn) {
+                cancelBtn.addEventListener('click', closeModalForm);
+            }
+
+            document.querySelectorAll(config.editBtnClass).forEach(btn => {
+                btn.addEventListener('click', event => {
+                    event.preventDefault();
+                    event.stopPropagation();
+                    const data = { id: btn.dataset.id };
+                    config.fields.forEach(field => {
+                        data[field.name] = btn.dataset[field.datasetKey || field.name] || '';
+                    });
+                    setFormMode('edit', data);
+                });
+            });
+        }
+
+        initEntityForm({
+            modalId: 'planFormModal',
+            toggleBtnId: 'togglePlanFormBtn',
+            cancelBtnId: 'cancelPlanFormBtn',
+            formId: 'planForm',
+            actionInputId: 'plan-action',
+            idInputId: 'plan-id',
+            titleId: 'planFormTitle',
+            submitBtnId: 'planSubmitBtn',
+            tab: 'planes',
+            createAction: 'crear_plan',
+            editAction: 'editar_plan',
+            createTitle: 'Nuevo Plan',
+            editTitle: 'Editar Plan',
+            submitCreateText: 'Crear Plan',
+            editBtnClass: '.edit-plan-btn',
+            fields: [
+                { name: 'nombre' },
+                { name: 'precio' },
+                { name: 'duracion' },
+                { name: 'descripcion' },
+            ],
+        });
+
+        initEntityForm({
+            modalId: 'claseFormModal',
+            toggleBtnId: 'toggleClaseFormBtn',
+            cancelBtnId: 'cancelClaseFormBtn',
+            formId: 'claseForm',
+            actionInputId: 'clase-action',
+            idInputId: 'clase-id',
+            titleId: 'claseFormTitle',
+            submitBtnId: 'claseSubmitBtn',
+            tab: 'clases',
+            createAction: 'crear_clase',
+            editAction: 'editar_clase',
+            createTitle: 'Nueva Clase',
+            editTitle: 'Editar Clase',
+            submitCreateText: 'Crear Clase',
+            editBtnClass: '.edit-clase-btn',
+            fields: [
+                { name: 'nombre' },
+                { name: 'dias' },
+                { name: 'horario' },
+            ],
+        });
+
+        initEntityForm({
+            modalId: 'profesorFormModal',
+            toggleBtnId: 'toggleProfesorFormBtn',
+            cancelBtnId: 'cancelProfesorFormBtn',
+            formId: 'profesorForm',
+            actionInputId: 'profesor-action',
+            idInputId: 'profesor-id',
+            titleId: 'profesorFormTitle',
+            submitBtnId: 'profesorSubmitBtn',
+            tab: 'profesores',
+            createAction: 'crear_profesor',
+            editAction: 'editar_profesor',
+            createTitle: 'Nuevo Profesor',
+            editTitle: 'Editar Profesor',
+            submitCreateText: 'Crear Profesor',
+            editBtnClass: '.edit-profesor-btn',
+            fields: [
+                { name: 'nombre' },
+                { name: 'apellido' },
+                { name: 'clases', type: 'multiselect', datasetKey: 'clases' },
+            ],
+        });
+
+        function openRowDetail(row) {
+            const type = row.dataset.viewType;
+
+            if (type === 'clase') {
+                const alumnos = row.dataset.alumnos ? row.dataset.alumnos.split('|||').filter(Boolean) : [];
+                showDetailModal('Detalle de Clase', [
+                    { label: 'Nombre', value: row.dataset.nombre },
+                    { label: 'Días', value: row.dataset.dias || '-' },
+                    { label: 'Horario', value: row.dataset.horario || '-' },
+                    { label: 'Cantidad de alumnos', value: row.dataset.alumnosCount || '0' },
+                    { label: 'Alumnos inscriptos', type: 'list', items: alumnos, emptyText: 'Sin alumnos inscriptos' },
+                ]);
+            } else if (type === 'profesor') {
+                const clases = row.dataset.clases ? row.dataset.clases.split('|||').filter(Boolean) : [];
+                showDetailModal('Detalle de Profesor', [
+                    { label: 'Nombre', value: row.dataset.nombre },
+                    { label: 'Apellido', value: row.dataset.apellido },
+                    { label: 'Clases asignadas', type: 'list', items: clases, emptyText: 'Sin clases asignadas' },
+                ]);
+            } else if (type === 'plan') {
+                showDetailModal('Detalle de Plan', [
+                    { label: 'Nombre', value: row.dataset.nombre },
+                    { label: 'Precio', value: '$' + row.dataset.precio },
+                    { label: 'Duración', value: row.dataset.duracion },
+                    { label: 'Descripción', value: row.dataset.descripcion || '-' },
+                ]);
+            } else if (type === 'alumno') {
+                const clases = row.dataset.clases ? row.dataset.clases.split('|||').filter(Boolean) : [];
+                showDetailModal('Detalle de Cliente', [
+                    { label: 'Nombre', value: row.dataset.nombre },
+                    { label: 'Apellido', value: row.dataset.apellido },
+                    { label: 'DNI', value: row.dataset.dni },
+                    { label: 'Ingresos al gym', value: row.dataset.ingresos },
+                    { label: 'Deuda', value: '$' + row.dataset.deuda },
+                    { label: 'Último ingreso', value: row.dataset.ultimoIngreso || '-' },
+                    { label: 'Clases inscriptas', type: 'list', items: clases, emptyText: 'Sin clases inscriptas' },
+                ]);
+            }
+        }
+
+        document.querySelectorAll('.clickable-row').forEach(row => {
+            row.addEventListener('click', event => {
+                if (event.target.closest('.actions')) return;
+                openRowDetail(row);
+            });
+        });
+
+        const messages = document.querySelectorAll('[data-message]');
+        if (messages.length > 0) {
+            const firstMessage = messages[0];
+            const text = firstMessage.getAttribute('data-message');
+            showModal(text);
+        }
+    });
+
+    function showModal(message) {
+        document.getElementById('modalMessage').textContent = message;
+        document.getElementById('messageModal').style.display = 'flex';
+    }
+
+    function closeModal() {
+        document.getElementById('messageModal').style.display = 'none';
+    }
+
+    function showDetailModal(title, rows) {
+        const body = document.getElementById('detailModalBody');
+        document.getElementById('detailModalTitle').textContent = title;
+        body.innerHTML = '';
+
+        rows.forEach(row => {
+            const item = document.createElement('div');
+            item.className = 'detail-row';
+
+            const label = document.createElement('span');
+            label.className = 'detail-label';
+            label.textContent = row.label;
+
+            const value = document.createElement('div');
+            value.className = 'detail-value';
+
+            if (row.type === 'list') {
+                if (row.items && row.items.length) {
+                    const list = document.createElement('ul');
+                    list.className = 'detail-list';
+                    row.items.forEach(entry => {
+                        const li = document.createElement('li');
+                        li.textContent = entry;
+                        list.appendChild(li);
+                    });
+                    value.appendChild(list);
+                } else {
+                    value.textContent = row.emptyText || '-';
+                }
+            } else {
+                value.textContent = row.value || '-';
+            }
+
+            item.appendChild(label);
+            item.appendChild(value);
+            body.appendChild(item);
+        });
+
+        document.getElementById('detailModal').style.display = 'flex';
+    }
+
+    function closeDetailModal() {
+        document.getElementById('detailModal').style.display = 'none';
+    }
+
+
+    document.addEventListener('keydown', function(event) {
+        if (event.key === 'Escape') {
+            closeModal();
+            closeDetailModal();
+            document.querySelectorAll('.form-modal').forEach(modal => {
+                modal.style.display = 'none';
+            });
+        }
+    });
     </script>
 </body>
 </html>
