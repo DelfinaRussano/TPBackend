@@ -24,5 +24,9 @@ urlpatterns = [
     path('profesores/', include('Profesor.urls')),
     path('planes/', include('Plan.urls')),
     path('alumnos/', include('Alumno.urls')),
+<<<<<<< HEAD
+    path('profesores/', include('Profesor.urls')),
+=======
     path('mi-admin/', alumno_views.admin_panel, name='admin_panel'),
+>>>>>>> origin/main
 ]
