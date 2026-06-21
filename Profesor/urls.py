@@ -18,3 +18,4 @@ app_name = 'profesor'
 urlpatterns = [
     path('crear/', views.crear_profesor, name='crear_profesor'),
 ]
+
