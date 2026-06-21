@@ -1,4 +1,4 @@
-<<<<<<< HEAD
+
 from django.shortcuts import render, get_object_or_404
 from .models import Profesor
 from Clase.models import Clase
@@ -49,7 +49,7 @@ def lista_profesores(request):
         'profesores': profesores,
     })
 
-=======
+
 from django.shortcuts import render, redirect
 from django.contrib import messages
 from .models import Profesor
@@ -75,4 +75,4 @@ def crear_profesor(request):
 
 	clases = Clase.objects.all()
 	return render(request, 'crear_profesor.html', {'clases': clases})
->>>>>>> origin/main
+
