@@ -40,6 +40,16 @@
         </div>
     </div>
 
+    <div id="confirmModal" class="modal" style="display: none;">
+        <div class="modal-content">
+            <div id="confirmModalMessage" class="modal-text"></div>
+            <div class="modal-actions">
+                <button type="button" id="confirmModalNoBtn" class="btn btn-secondary">No</button>
+                <button type="button" id="confirmModalYesBtn" class="btn btn-danger">Sí</button>
+            </div>
+        </div>
+    </div>
+
 
     {% if messages %}
         {% for message in messages %}
@@ -148,6 +158,9 @@
                                            data-nombre="{{ clase.nombre }}"
                                            data-dias="{{ clase.dias }}"
                                            data-horario="{{ clase.horario }}">✏️</a>
+                                        <a href="#" class="delete-clase-btn delete" title="Eliminar"
+                                           data-id="{{ clase.id }}"
+                                           data-nombre="{{ clase.nombre }}">🗑️</a>
                                     </td>
                                 </tr>
                             {% empty %}
@@ -538,6 +551,46 @@
             ],
         });
 
+        document.querySelectorAll('.delete-clase-btn').forEach(btn => {
+            btn.addEventListener('click', event => {
+                event.preventDefault();
+                event.stopPropagation();
+                const nombre = btn.dataset.nombre || 'esta clase';
+                const claseId = btn.dataset.id;
+
+                showConfirmModal(`¿Eliminar la clase "${nombre}"?`, () => {
+                    const csrfInput = document.querySelector('#claseForm input[name="csrfmiddlewaretoken"]');
+                    const form = document.createElement('form');
+                    form.method = 'POST';
+                    form.action = '';
+
+                    const fields = {
+                        csrfmiddlewaretoken: csrfInput ? csrfInput.value : '',
+                        action: 'eliminar_clase',
+                        clase_id: claseId,
+                    };
+
+                    Object.entries(fields).forEach(([name, value]) => {
+                        const input = document.createElement('input');
+                        input.type = 'hidden';
+                        input.name = name;
+                        input.value = value;
+                        form.appendChild(input);
+                    });
+
+                    document.body.appendChild(form);
+                    form.submit();
+                });
+            });
+        });
+
+        document.getElementById('confirmModalYesBtn').addEventListener('click', () => {
+            if (confirmCallback) confirmCallback();
+            closeConfirmModal();
+        });
+
+        document.getElementById('confirmModalNoBtn').addEventListener('click', closeConfirmModal);
+
         initEntityForm({
             modalId: 'claseFormModal',
             toggleBtnId: 'toggleClaseFormBtn',
@@ -693,11 +746,25 @@
         document.getElementById('detailModal').style.display = 'none';
     }
 
+    let confirmCallback = null;
+
+    function showConfirmModal(message, onConfirm) {
+        document.getElementById('confirmModalMessage').textContent = message;
+        confirmCallback = onConfirm;
+        document.getElementById('confirmModal').style.display = 'flex';
+    }
+
+    function closeConfirmModal() {
+        document.getElementById('confirmModal').style.display = 'none';
+        confirmCallback = null;
+    }
+
 
     document.addEventListener('keydown', function(event) {
         if (event.key === 'Escape') {
             closeModal();
             closeDetailModal();
+            closeConfirmModal();
             document.querySelectorAll('.form-modal').forEach(modal => {
                 modal.style.display = 'none';
             });

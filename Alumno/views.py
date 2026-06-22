@@ -141,6 +141,16 @@ def admin_panel(request):
                     messages.success(request, 'Clase creada correctamente.')
                 return redirect(f"{request.path}?tab=clases")
 
+        elif action == 'eliminar_clase':
+            active_tab = 'clases'
+            clase_id = request.POST.get('clase_id')
+            if clase_id:
+                clase = get_object_or_404(Clase, pk=clase_id)
+                nombre = clase.nombre
+                clase.delete()
+                messages.success(request, f'Clase "{nombre}" eliminada correctamente.')
+            return redirect(f"{request.path}?tab=clases")
+
         elif action in ('crear_profesor', 'editar_profesor'):
             active_tab = 'profesores'
             show_profesor_form = True

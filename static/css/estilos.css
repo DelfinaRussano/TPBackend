@@ -178,6 +178,17 @@ body {
 	text-decoration: none;
 }
 
+.btn-danger {
+	background: #d0342c;
+	color: #fff;
+}
+
+.modal-actions {
+	display: flex;
+	gap: 12px;
+	justify-content: center;
+}
+
 .messages {
 	max-width: 1180px;
 	margin: 20px auto;
