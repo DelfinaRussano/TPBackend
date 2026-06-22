@@ -1,5 +1,6 @@
-<<<<<<< HEAD
-from django.shortcuts import render, get_object_or_404
+from django.shortcuts import render, get_object_or_404, redirect
+from django.db.models import Q
+from django.contrib import messages
 from .models import Profesor
 from Clase.models import Clase
 
@@ -42,18 +43,14 @@ def lista_profesores(request):
     # Captura el texto ingresado en el buscador (viene por GET en la URL)
     q = request.GET.get('q')
     if q:
-        # Filtra los profesores cuyo nombre contenga ese texto
-        profesores = profesores.filter(nombre__icontains=q)
+        # Filtra los profesores cuyo nombre o apellido contenga ese texto
+        profesores = profesores.filter(
+            Q(nombre__icontains=q) | Q(apellido__icontains=q)
+        )
     # Renderiza el template enviando la lista de profesores
     return render(request, 'lista_profesores.html', {
         'profesores': profesores,
     })
-
-=======
-from django.shortcuts import render, redirect
-from django.contrib import messages
-from .models import Profesor
-from Clase.models import Clase
 
 
 def crear_profesor(request):
@@ -75,4 +72,4 @@ def crear_profesor(request):
 
 	clases = Clase.objects.all()
 	return render(request, 'crear_profesor.html', {'clases': clases})
->>>>>>> origin/main
+
