@@ -2,6 +2,7 @@ from django.urls import path
 from . import views
 
 
+
 # Nombre del espacio de URLs de esta app
 app_name = 'profesor'
 urlpatterns = [
@@ -13,8 +14,10 @@ urlpatterns = [
     path('', views.lista_profesores, name='lista_profesores'),
 ]
 
+
 app_name = 'profesor'
 
 urlpatterns = [
     path('crear/', views.crear_profesor, name='crear_profesor'),
 ]
+
