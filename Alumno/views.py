@@ -1,14 +1,38 @@
+import re
+import unicodedata
+
 from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib import messages
+from django.contrib.auth import get_user_model
 from django.contrib.auth.decorators import login_required
+from django.db import transaction
 from django.db.models import Q
 from accounts.decorators import admin_required, alumno_required
+from Alumno.forms import AlumnoCreateForm
 from Alumno.models import Alumno
 from Clase.models import Clase
 from Plan.models import Plan
 from Profesor.models import Profesor
 from Reclamos.models import Reclamos
 from django.core.paginator import Paginator
+
+User = get_user_model()
+
+def normalize_name(value):
+    value = unicodedata.normalize('NFKD', value)
+    value = value.encode('ascii', 'ignore').decode('ascii')
+    value = re.sub(r'[^a-zA-Z0-9]+', '.', value).strip('.')
+    return value.lower()
+
+
+def generate_unique_email(nombre, apellido):
+    base = f"{normalize_name(nombre)}.{normalize_name(apellido)}"
+    email = f"{base}@centergym.com"
+    suffix = 0
+    while User.objects.filter(email=email).exists():
+        suffix += 1
+        email = f"{base}{suffix}@centergym.com"
+    return email
 
 
 ALUMNOS_POR_PAGINA = 6
@@ -42,42 +66,40 @@ def dashboard_alumno(request, alumno_id):
 @admin_required
 def crear_alumno(request):
     if request.method == 'POST':
-        nombre = request.POST.get('nombre', '').strip()
-        apellido = request.POST.get('apellido', '').strip()
-        dni = request.POST.get('DNI', '').strip()
-        monto_deuda = request.POST.get('MontoDeuda', '0').strip() or '0'
+        form = AlumnoCreateForm(request.POST)
+        if form.is_valid():
+            nombre = form.cleaned_data['nombre']
+            apellido = form.cleaned_data['apellido']
+            email = generate_unique_email(nombre, apellido)
 
-        if not nombre or not apellido or not dni:
-            messages.error(request, 'Nombre, apellido y DNI son obligatorios.')
-            return render(request, 'crear_alumno.html', {
-                'nombre': nombre,
-                'apellido': apellido,
-                'DNI': dni,
-                'MontoDeuda': monto_deuda,
-            })
+            try:
+                with transaction.atomic():
+                    usuario = User.objects.create_user(
+                        email=email,
+                        password='alumno',
+                        role=User.ALUMNO,
+                        first_name=nombre,
+                        last_name=apellido,
+                    )
 
-        try:
-            dni_int = int(dni)
-            monto_deuda_decimal = float(monto_deuda)
-        except ValueError:
-            messages.error(request, 'DNI y deuda deben ser números válidos.')
-            return render(request, 'crear_alumno.html', {
-                'nombre': nombre,
-                'apellido': apellido,
-                'DNI': dni,
-                'MontoDeuda': monto_deuda,
-            })
+                    alumno = form.save()
+                    usuario.alumno = alumno
+                    usuario.save()
 
-        Alumno.objects.create(
-            nombre=nombre,
-            apellido=apellido,
-            DNI=dni_int,
-            MontoDeuda=monto_deuda_decimal,
-        )
-        messages.success(request, 'Alumno creado correctamente.')
-        return redirect('admin_panel')
+                messages.success(
+                    request,
+                    f'Alumno creado correctamente. Email: {email} / Contraseña inicial: alumno'
+                )
+                return redirect('admin_panel')
+            except Exception as exc:
+                messages.error(request, 'Error al crear el alumno. Por favor revise los datos e intente nuevamente.')
+                form.add_error(None, str(exc))
+        else:
+            messages.error(request, 'Corrige los errores del formulario.')
+    else:
+        form = AlumnoCreateForm()
 
-    return render(request, 'crear_alumno.html')
+    return render(request, 'crear_alumno.html', {'form': form})
 
 
 @login_required(login_url='home')
