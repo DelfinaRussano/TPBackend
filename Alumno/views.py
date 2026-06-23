@@ -1,7 +1,8 @@
 from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib import messages
-from django.core.paginator import Paginator
+from django.contrib.auth.decorators import login_required
 from django.db.models import Q
+from accounts.decorators import admin_required, alumno_required
 from Alumno.models import Alumno
 from Clase.models import Clase
 from Plan.models import Plan
@@ -24,6 +25,8 @@ def lista_alumnos(request):
     return render(request, 'listaAlumnos.html', {'alumnos': alumnos, 'q': q})
 
 
+@login_required(login_url='home')
+@admin_required
 def crear_alumno(request):
     if request.method == 'POST':
         nombre = request.POST.get('nombre', '').strip()
@@ -64,6 +67,8 @@ def crear_alumno(request):
     return render(request, 'crear_alumno.html')
 
 
+@login_required(login_url='home')
+@admin_required
 def admin_panel(request):
     active_tab = request.GET.get('tab', 'clientes')
     show_plan_form = False
@@ -265,6 +270,8 @@ def admin_panel(request):
 
     return render(request, 'admin.html', context)
 
+@login_required(login_url='home')
+@alumno_required
 def mis_clases(request, alumno_id):
     alumno = get_object_or_404(Alumno, id=alumno_id)
     clases = alumno.clases.all()
@@ -279,6 +286,8 @@ def mis_clases(request, alumno_id):
     })
 
 
+@login_required(login_url='home')
+@alumno_required
 def mis_reclamos(request, alumno_id):
     alumno = get_object_or_404(Alumno, id=alumno_id)
     reclamos = alumno.reclamos.all().order_by('-fecha_reclamo')
@@ -289,6 +298,8 @@ def mis_reclamos(request, alumno_id):
     })
 
 
+@login_required(login_url='home')
+@alumno_required
 def crear_reclamo(request, alumno_id):
     alumno = get_object_or_404(Alumno, id=alumno_id)
 
