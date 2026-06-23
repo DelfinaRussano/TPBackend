@@ -22,6 +22,7 @@
         <a href="#" class="nav-link{% if active_tab == 'profesores' %} active{% endif %}" data-tab="profesores">PROFESORES</a>
         <a href="#" class="nav-link{% if active_tab == 'planes' %} active{% endif %}" data-tab="planes">PLANES</a>
         <a href="#" class="nav-link{% if active_tab == 'reclamos' %} active{% endif %}" data-tab="reclamos">RECLAMOS</a>
+        <a href="#" class="nav-link{% if active_tab == 'cuentas' %} active{% endif %}" data-tab="cuentas">CUENTAS</a>
     </nav>
 
 
@@ -37,16 +38,6 @@
             <h2 id="detailModalTitle" class="modal-title"></h2>
             <div id="detailModalBody" class="modal-detail-body"></div>
             <button onclick="closeDetailModal()" class="btn btn-primary">OK</button>
-        </div>
-    </div>
-
-    <div id="confirmModal" class="modal" style="display: none;">
-        <div class="modal-content">
-            <div id="confirmModalMessage" class="modal-text"></div>
-            <div class="modal-actions">
-                <button type="button" id="confirmModalNoBtn" class="btn btn-secondary">No</button>
-                <button type="button" id="confirmModalYesBtn" class="btn btn-danger">Sí</button>
-            </div>
         </div>
     </div>
 
@@ -66,7 +57,6 @@
             <section class="card">
                 <div class="card-controls">
                     <form method="get" class="search" action="">
-                        <input type="hidden" name="tab" value="clientes">
                         <span class="search-icon">🔍</span>
                         <input type="text" name="q" placeholder="Buscar por nombre, email o DNI..." value="{{ q_alumnos }}">
                         <button type="submit" class="btn">Buscar</button>
@@ -105,8 +95,8 @@
                                            data-nombre="{{ alumno.nombre }}"
                                            data-apellido="{{ alumno.apellido }}"
                                            data-dni="{{ alumno.DNI }}"
-                                           data-montodeuda="{{ alumno.MontoDeuda }}"
-                                           data-clases="{% for c in alumno.clases.all %}{{ c.id }}{% if not forloop.last %},{% endif %}{% endfor %}">✏️</a>
+                                           data-monto-deuda="{{ alumno.MontoDeuda }}"
+                                           data-clases="{% for clase in alumno.clases.all %}{{ clase.id }}{% if not forloop.last %},{% endif %}{% endfor %}">✏️</a>
                                     </td>
                                 </tr>
                             {% empty %}
@@ -117,32 +107,15 @@
                         </tbody>
                     </table>
                 </div>
-                {% if alumnos.paginator.num_pages > 1 %}
                 <div class="pagination">
-                    {% if alumnos.has_previous %}
-                        <a href="?tab=clientes&amp;q={{ q_alumnos|urlencode }}&amp;page={{ alumnos.previous_page_number }}" class="page">&lt;</a>
-                    {% else %}
-                        <button type="button" class="page" disabled>&lt;</button>
-                    {% endif %}
-
-                    {% for num in alumnos.paginator.page_range %}
-                        {% if num == alumnos.number %}
-                            <span class="page active">{{ num }}</span>
-                        {% else %}
-                            <a href="?tab=clientes&amp;q={{ q_alumnos|urlencode }}&amp;page={{ num }}" class="page">{{ num }}</a>
-                        {% endif %}
-                    {% endfor %}
-
-                    {% if alumnos.has_next %}
-                        <a href="?tab=clientes&amp;q={{ q_alumnos|urlencode }}&amp;page={{ alumnos.next_page_number }}" class="page">&gt;</a>
-                    {% else %}
-                        <button type="button" class="page" disabled>&gt;</button>
-                    {% endif %}
+                    <button class="page">&lt;</button>
+                    <button class="page active">1</button>
+                    <button class="page">2</button>
+                    <button class="page">3</button>
+                    <span class="page-dots">...</span>
+                    <button class="page">&gt;</button>
                 </div>
-                <p class="table-summary">Mostrando {{ alumnos.start_index }}–{{ alumnos.end_index }} de {{ alumnos_total }} cliente(s) — Página {{ alumnos.number }} de {{ alumnos.paginator.num_pages }} — hacé clic en una fila para ver el detalle</p>
-                {% else %}
-                <p class="table-summary">Mostrando {{ alumnos_total }} cliente(s) — Solo 1 página — hacé clic en una fila para ver el detalle</p>
-                {% endif %}
+                <p class="table-summary">Mostrando {{ alumnos|length }} cliente(s) — hacé clic en una fila para ver el detalle</p>
             </section>
         </section>
 
@@ -182,9 +155,12 @@
                                            data-nombre="{{ clase.nombre }}"
                                            data-dias="{{ clase.dias }}"
                                            data-horario="{{ clase.horario }}">✏️</a>
-                                        <a href="#" class="delete-clase-btn delete" title="Eliminar"
-                                           data-id="{{ clase.id }}"
-                                           data-nombre="{{ clase.nombre }}">🗑️</a>
+                                        <form method="post" class="delete-clase-form">
+                                            {% csrf_token %}
+                                            <input type="hidden" name="action" value="eliminar_clase">
+                                            <input type="hidden" name="clase_id" value="{{ clase.id }}">
+                                            <button type="submit" class="delete" title="Eliminar">🗑️</button>
+                                        </form>
                                     </td>
                                 </tr>
                             {% empty %}
@@ -308,6 +284,14 @@
                 <h1>RECLAMOS</h1>
             </section>
             <section class="card">
+                <div class="card-controls">
+                    <form method="get" class="search" action="">
+                        <input type="hidden" name="tab" value="reclamos">
+                        <span class="search-icon">🔍</span>
+                        <input type="text" name="q_reclamos" placeholder="Buscar por nombre o apellido del alumno..." value="{{ q_reclamos }}">
+                        <button type="submit" class="btn">Buscar</button>
+                    </form>
+                </div>
                 <div class="table-wrap">
                     <table>
                         <thead>
@@ -339,11 +323,112 @@
                 <p class="table-summary">Mostrando {{ reclamos|length }} reclamo(s)</p>
             </section>
         </section>
+
+        <section class="tab-panel{% if active_tab == 'cuentas' %} active{% endif %}" id="cuentas">
+            <section class="page-header">
+                <h1>CUENTAS</h1>
+            </section>
+
+            <div class="account-grid">
+                <section class="card">
+                    <h2 class="form-panel-title">Crear cuenta de acceso</h2>
+                    <form method="post" class="form-card" id="cuentaForm">
+                        {% csrf_token %}
+                        <input type="hidden" name="action" value="crear_cuenta">
+                        <div class="form-group">
+                            <label for="cuenta-role">Tipo de cuenta</label>
+                            <select id="cuenta-role" name="role" required>
+                                <option value="ALUMNO" {% if cuenta_form.role == 'ALUMNO' %}selected{% endif %}>Alumno</option>
+                                <option value="PROFESOR" {% if cuenta_form.role == 'PROFESOR' %}selected{% endif %}>Profesor</option>
+                            </select>
+                        </div>
+                        <div class="form-group account-profile-field" data-profile-role="ALUMNO">
+                            <label for="cuenta-alumno">Alumno</label>
+                            <select id="cuenta-alumno" name="alumno_id">
+                                <option value="">Seleccionar alumno</option>
+                                {% for alumno in alumnos_sin_cuenta %}
+                                    <option value="{{ alumno.id }}" {% if cuenta_form.alumno_id == alumno.id %}selected{% endif %}>
+                                        {{ alumno.apellido }}, {{ alumno.nombre }} - DNI {{ alumno.DNI }}
+                                    </option>
+                                {% empty %}
+                                    <option value="" disabled>No hay alumnos sin cuenta</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="form-group account-profile-field" data-profile-role="PROFESOR">
+                            <label for="cuenta-profesor">Profesor</label>
+                            <select id="cuenta-profesor" name="profesor_id">
+                                <option value="">Seleccionar profesor</option>
+                                {% for profesor in profesores_sin_cuenta %}
+                                    <option value="{{ profesor.id }}" {% if cuenta_form.profesor_id == profesor.id %}selected{% endif %}>
+                                        {{ profesor.apellido }}, {{ profesor.nombre }}
+                                    </option>
+                                {% empty %}
+                                    <option value="" disabled>No hay profesores sin cuenta</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="cuenta-email">Email</label>
+                            <input type="email" id="cuenta-email" name="email" value="{{ cuenta_form.email|default:'' }}" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="cuenta-password">ContraseÃ±a</label>
+                            <input type="password" id="cuenta-password" name="password" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="cuenta-password2">Repetir contraseÃ±a</label>
+                            <input type="password" id="cuenta-password2" name="password2" required>
+                        </div>
+                        <div class="form-actions">
+                            <button type="submit" class="btn btn-primary">Crear Cuenta</button>
+                        </div>
+                    </form>
+                </section>
+
+                <section class="card">
+                    <h2 class="form-panel-title">Cuentas creadas</h2>
+                    <div class="table-wrap">
+                        <table class="compact-table">
+                            <thead>
+                                <tr>
+                                    <th>EMAIL</th>
+                                    <th>ROL</th>
+                                    <th>VINCULADO A</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for usuario in usuarios %}
+                                    <tr>
+                                        <td>{{ usuario.email }}</td>
+                                        <td>{{ usuario.get_role_display }}</td>
+                                        <td>
+                                            {% if usuario.alumno %}
+                                                {{ usuario.alumno.nombre }} {{ usuario.alumno.apellido }}
+                                            {% elif usuario.profesor %}
+                                                {{ usuario.profesor.nombre }} {{ usuario.profesor.apellido }}
+                                            {% else %}
+                                                -
+                                            {% endif %}
+                                        </td>
+                                    </tr>
+                                {% empty %}
+                                    <tr>
+                                        <td colspan="3">No hay cuentas creadas para alumnos o profesores.</td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    <p class="table-summary">Mostrando {{ usuarios|length }} cuenta(s)</p>
+                </section>
+            </div>
+        </section>
     </main>
 
     <div id="alumnoFormModal" class="modal form-modal" style="display: {% if show_alumno_form %}flex{% else %}none{% endif %};">
         <div class="modal-content">
-            <h2 class="modal-title" id="alumnoFormTitle">{% if alumno_edit_id %}Editar Cliente{% else %}Editar Cliente{% endif %}</h2>
+            <h2 class="modal-title" id="alumnoFormTitle">{% if alumno_edit_id %}Editar Cliente{% else %}Nuevo Cliente{% endif %}</h2>
             <form method="post" class="form-card" id="alumnoForm">
                 {% csrf_token %}
                 <input type="hidden" name="action" id="alumno-action" value="editar_alumno">
@@ -361,8 +446,8 @@
                     <input type="text" id="alumno-dni" name="DNI" value="{{ alumno_form.DNI|default:'' }}" required>
                 </div>
                 <div class="form-group">
-                    <label for="alumno-deuda">Deuda (en pesos)</label>
-                    <input type="number" id="alumno-deuda" name="MontoDeuda" value="{{ alumno_form.MontoDeuda|default:'0' }}" min="0" step="0.01">
+                    <label for="alumno-deuda">Deuda</label>
+                    <input type="text" id="alumno-deuda" name="MontoDeuda" value="{{ alumno_form.MontoDeuda|default:'' }}">
                 </div>
                 <div class="form-group">
                     <label for="alumno-clases">Clases (seleccioná una o más)</label>
@@ -384,7 +469,7 @@
         </div>
     </div>
 
-    <div id="claseFormModal" class="modal form-modal" style="display: {% if show_clase_form %}flex{% else %}none{% endif %};">
+   <div id="claseFormModal" class="modal form-modal {% if show_clase_form %}show{% endif %}">
         <div class="modal-content">
             <h2 class="modal-title" id="claseFormTitle">{% if clase_edit_id %}Editar Clase{% else %}Nueva Clase{% endif %}</h2>
             <form method="post" class="form-card" id="claseForm">
@@ -596,6 +681,7 @@
 
         initEntityForm({
             modalId: 'alumnoFormModal',
+            toggleBtnId: '',
             cancelBtnId: 'cancelAlumnoFormBtn',
             formId: 'alumnoForm',
             actionInputId: 'alumno-action',
@@ -613,7 +699,7 @@
                 { name: 'nombre' },
                 { name: 'apellido' },
                 { name: 'DNI', datasetKey: 'dni' },
-                { name: 'MontoDeuda', datasetKey: 'montodeuda' },
+                { name: 'MontoDeuda', datasetKey: 'montoDeuda' },
                 { name: 'clases', type: 'multiselect', datasetKey: 'clases' },
             ],
         });
@@ -641,46 +727,6 @@
                 { name: 'descripcion' },
             ],
         });
-
-        document.querySelectorAll('.delete-clase-btn').forEach(btn => {
-            btn.addEventListener('click', event => {
-                event.preventDefault();
-                event.stopPropagation();
-                const nombre = btn.dataset.nombre || 'esta clase';
-                const claseId = btn.dataset.id;
-
-                showConfirmModal(`¿Eliminar la clase "${nombre}"?`, () => {
-                    const csrfInput = document.querySelector('#claseForm input[name="csrfmiddlewaretoken"]');
-                    const form = document.createElement('form');
-                    form.method = 'POST';
-                    form.action = '';
-
-                    const fields = {
-                        csrfmiddlewaretoken: csrfInput ? csrfInput.value : '',
-                        action: 'eliminar_clase',
-                        clase_id: claseId,
-                    };
-
-                    Object.entries(fields).forEach(([name, value]) => {
-                        const input = document.createElement('input');
-                        input.type = 'hidden';
-                        input.name = name;
-                        input.value = value;
-                        form.appendChild(input);
-                    });
-
-                    document.body.appendChild(form);
-                    form.submit();
-                });
-            });
-        });
-
-        document.getElementById('confirmModalYesBtn').addEventListener('click', () => {
-            if (confirmCallback) confirmCallback();
-            closeConfirmModal();
-        });
-
-        document.getElementById('confirmModalNoBtn').addEventListener('click', closeConfirmModal);
 
         initEntityForm({
             modalId: 'claseFormModal',
@@ -775,6 +821,32 @@
             });
         });
 
+        document.querySelectorAll('.delete-clase-form').forEach(form => {
+            form.addEventListener('submit', event => {
+                if (!confirm('¿Seguro que querés eliminar esta clase?')) {
+                    event.preventDefault();
+                }
+            });
+        });
+
+        const cuentaRole = document.getElementById('cuenta-role');
+        const profileFields = document.querySelectorAll('.account-profile-field');
+
+        function updateCuentaProfileFields() {
+            if (!cuentaRole) return;
+            profileFields.forEach(field => {
+                const isActive = field.dataset.profileRole === cuentaRole.value;
+                field.style.display = isActive ? 'flex' : 'none';
+                const select = field.querySelector('select');
+                if (select) select.disabled = !isActive;
+            });
+        }
+
+        if (cuentaRole) {
+            cuentaRole.addEventListener('change', updateCuentaProfileFields);
+            updateCuentaProfileFields();
+        }
+
         const messages = document.querySelectorAll('[data-message]');
         if (messages.length > 0) {
             const firstMessage = messages[0];
@@ -837,25 +909,11 @@
         document.getElementById('detailModal').style.display = 'none';
     }
 
-    let confirmCallback = null;
-
-    function showConfirmModal(message, onConfirm) {
-        document.getElementById('confirmModalMessage').textContent = message;
-        confirmCallback = onConfirm;
-        document.getElementById('confirmModal').style.display = 'flex';
-    }
-
-    function closeConfirmModal() {
-        document.getElementById('confirmModal').style.display = 'none';
-        confirmCallback = null;
-    }
-
 
     document.addEventListener('keydown', function(event) {
         if (event.key === 'Escape') {
             closeModal();
             closeDetailModal();
-            closeConfirmModal();
             document.querySelectorAll('.form-modal').forEach(modal => {
                 modal.style.display = 'none';
             });

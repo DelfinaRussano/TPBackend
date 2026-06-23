@@ -10,7 +10,7 @@ User = get_user_model()
 class UserAdmin(BaseUserAdmin):
     fieldsets = (
         (None, {'fields': ('email', 'password')}),
-        (_('Personal info'), {'fields': ('first_name', 'last_name')}),
+        (_('Personal info'), {'fields': ('first_name', 'last_name', 'alumno', 'profesor')}),
         (_('Permissions'), {'fields': ('is_active', 'is_staff', 'is_superuser', 'groups', 'user_permissions')}),
         (_('Role'), {'fields': ('role',)}),
         (_('Important dates'), {'fields': ('last_login', 'date_joined')}),
@@ -18,10 +18,10 @@ class UserAdmin(BaseUserAdmin):
     add_fieldsets = (
         (None, {
             'classes': ('wide',),
-            'fields': ('email', 'role', 'password1', 'password2'),
+            'fields': ('email', 'role', 'alumno', 'profesor', 'password1', 'password2'),
         }),
     )
-    list_display = ('email', 'role', 'is_staff', 'is_superuser')
+    list_display = ('email', 'role', 'alumno', 'profesor', 'is_staff', 'is_superuser')
     list_filter = ('role', 'is_staff', 'is_superuser', 'is_active')
     search_fields = ('email',)
     ordering = ('email',)

@@ -50,6 +50,20 @@ class User(AbstractUser):
         choices=ROLE_CHOICES,
         default=ALUMNO,
     )
+    alumno = models.OneToOneField(
+        'Alumno.Alumno',
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name='usuario',
+    )
+    profesor = models.OneToOneField(
+        'Profesor.Profesor',
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name='usuario',
+    )
 
     objects = CustomUserManager()
 
