@@ -3,6 +3,8 @@ from django.db.models import Q
 from django.contrib import messages
 from .models import Profesor
 from Clase.models import Clase
+from django.contrib.auth.decorators import login_required
+from accounts.decorators import profesor_required
 
 # Muestra las clases asignadas a un profesor específico
 @login_required(login_url='home')
@@ -70,7 +72,4 @@ def crear_profesor(request):
 
     clases = Clase.objects.all()
     return render(request, 'crear_profesor.html', {'clases': clases})
-
-	clases = Clase.objects.all()
-	return render(request, 'crear_profesor.html', {'clases': clases})
 
