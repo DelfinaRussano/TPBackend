@@ -274,13 +274,6 @@ Actualmente se encuentra implementada la estructura principal del CRM, incluyend
 
 ---
 
-## 👨‍💻 Integrantes
-
-- Daniela Tassara
-- María Florencia Quintana
-
----
-
 ## 📚 Materia
 
 Backend – Trabajo Práctico Final  
