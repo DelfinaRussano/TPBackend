@@ -16,9 +16,12 @@
             <a href="{% url 'alumno:mis_reclamos' alumno.id %}">Mis Reclamos</a>
             <a href="{% url 'alumno:crear_reclamo' alumno.id %}">Nuevo Reclamo</a>
         </div>
+        <div class="topbar-actions">
+            <a href="{% url 'accounts:logout' %}" class="logout-link">Cerrar sesión</a>
+        </div>
     </div>
 
-    <div class="container">
+    <main class="container">
         <div class="card">
             <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:18px">
                 <h2>MIS CLASES</h2>
@@ -26,12 +29,10 @@
             </div>
 
             <div class="controls">
-                <div class="search">
-                    <form method="GET" style="display:flex; gap:8px; margin:0;">
-                        <input type="text" name="q" placeholder="Buscar clase..." value="{{ request.GET.q }}">
-                        <button type="submit" class="btn" style="background:#ff8a00; color:white; border:none; cursor:pointer;">Buscar</button>
-                    </form>
-                </div>
+                <form method="GET" class="search-form">
+                    <input type="text" name="q" placeholder="Buscar clase..." value="{{ request.GET.q|default:'' }}">
+                    <button type="submit" class="btn btn-primary">Buscar</button>
+                </form>
                 <div class="muted">{{ clases|length }} clases</div>
             </div>
 
@@ -59,13 +60,13 @@
             </table>
 
             <div style="margin-top:20px;">
-                <a href="{% url 'alumno:dashboard' alumno.id %}" class="btn" style="background:#6c757d;">← Volver</a>
+                <a href="{% url 'alumno:dashboard' alumno.id %}" class="btn btn-secondary">← Volver</a>
             </div>
         </div>
+    </main>
 
-        <div class="app-footer">
-            <img src="{% static 'LogoAppGym.png' %}" alt="Logo Center GYM">
-        </div>
-    </div>
+    <footer class="app-footer">
+        <img src="{% static 'LogoAppGym.png' %}" alt="Logo Center GYM">
+    </footer>
 </body>
 </html>

@@ -1,10 +1,34 @@
+import unicodedata
+
 from django.shortcuts import render, get_object_or_404, redirect
+from django.db import transaction
 from django.db.models import Q
 from django.contrib import messages
+from django.contrib.auth import get_user_model
 from .models import Profesor
 from Clase.models import Clase
 from django.contrib.auth.decorators import login_required
 from accounts.decorators import profesor_required
+
+User = get_user_model()
+
+
+def normalize_name(value):
+    return ''.join(
+        c for c in unicodedata.normalize('NFKD', value)
+        if c.isalnum() or c == '.'
+    ).strip('.').lower()
+
+
+def generate_unique_email(nombre, apellido):
+    base = f"{normalize_name(nombre)}.{normalize_name(apellido)}"
+    email = f"{base}@centergym.com"
+    suffix = 0
+    while User.objects.filter(email=email).exists():
+        suffix += 1
+        email = f"{base}{suffix}@centergym.com"
+    return email
+
 
 # Muestra las clases asignadas a un profesor específico
 @login_required(login_url='home')
@@ -64,11 +88,29 @@ def crear_profesor(request):
             clases = Clase.objects.all()
             return render(request, 'crear_profesor.html', {'clases': clases, 'nombre': nombre, 'apellido': apellido})
 
-        profesor = Profesor.objects.create(nombre=nombre, apellido=apellido)
-        if clases_ids:
-            profesor.clases.set(clases_ids)
-        messages.success(request, 'Profesor creado correctamente.')
-        return redirect('admin_panel')
+        email = generate_unique_email(nombre, apellido)
+        try:
+            with transaction.atomic():
+                profesor = Profesor.objects.create(nombre=nombre, apellido=apellido)
+                if clases_ids:
+                    profesor.clases.set(clases_ids)
+
+                usuario = User.objects.create_user(
+                    email=email,
+                    password='profesor',
+                    role=User.PROFESOR,
+                    first_name=nombre,
+                    last_name=apellido,
+                )
+                usuario.profesor = profesor
+                usuario.save()
+
+            messages.success(request, f'Profesor creado correctamente. Email: {email} / Contraseña inicial: profesor')
+            return redirect('admin_panel')
+        except Exception:
+            messages.error(request, 'Error al crear el profesor. Por favor revise los datos e intente nuevamente.')
+            clases = Clase.objects.all()
+            return render(request, 'crear_profesor.html', {'clases': clases, 'nombre': nombre, 'apellido': apellido})
 
     clases = Clase.objects.all()
     return render(request, 'crear_profesor.html', {'clases': clases})

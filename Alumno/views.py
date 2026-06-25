@@ -258,10 +258,29 @@ def admin_panel(request):
                     profesor.clases.set(profesor_form['clases_ids'])
                     messages.success(request, 'Profesor actualizado correctamente.')
                 else:
-                    profesor = Profesor.objects.create(nombre=nombre, apellido=apellido)
-                    profesor.clases.set(profesor_form['clases_ids'])
-                    messages.success(request, 'Profesor creado correctamente.')
-                return redirect(f"{request.path}?tab=profesores")
+                    email = generate_unique_email(nombre, apellido)
+                    try:
+                        with transaction.atomic():
+                            profesor = Profesor.objects.create(nombre=nombre, apellido=apellido)
+                            profesor.clases.set(profesor_form['clases_ids'])
+
+                            usuario = User.objects.create_user(
+                                email=email,
+                                password='profesor',
+                                role=User.PROFESOR,
+                                first_name=nombre,
+                                last_name=apellido,
+                            )
+                            usuario.profesor = profesor
+                            usuario.save()
+
+                        messages.success(
+                            request,
+                            f'Profesor creado correctamente. Email: {email} / Contraseña inicial: profesor'
+                        )
+                        return redirect(f"{request.path}?tab=profesores")
+                    except Exception:
+                        messages.error(request, 'Error al crear el profesor. Por favor revise los datos e intente nuevamente.')
 
     q_alumnos = request.GET.get('q', '').strip()
     alumnos_qs = Alumno.objects.prefetch_related('clases')

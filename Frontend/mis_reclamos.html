@@ -16,13 +16,16 @@
             <a href="{% url 'alumno:mis_reclamos' alumno.id %}" class="active">Mis Reclamos</a>
             <a href="{% url 'alumno:crear_reclamo' alumno.id %}">Nuevo Reclamo</a>
         </div>
+        <div class="topbar-actions">
+            <a href="{% url 'accounts:logout' %}" class="logout-link">Cerrar sesión</a>
+        </div>
     </div>
 
-    <div class="container">
+    <main class="container">
         <div class="card">
             <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px">
                 <h2>MIS RECLAMOS</h2>
-                <a class="btn" href="{% url 'alumno:crear_reclamo' alumno.id %}" style="background:#ff8a00; color:#fff;">+ Nuevo Reclamo</a>
+                <a class="btn btn-primary" href="{% url 'alumno:crear_reclamo' alumno.id %}">+ Nuevo Reclamo</a>
             </div>
 
             <div style="margin-bottom:12px;">
@@ -69,13 +72,13 @@
             </table>
 
             <div style="margin-top:20px;">
-                <a href="{% url 'alumno:dashboard' alumno.id %}" class="btn" style="background:#6c757d;">← Volver</a>
+                <a href="{% url 'alumno:dashboard' alumno.id %}" class="btn btn-secondary">← Volver</a>
             </div>
         </div>
+    </main>
 
-        <div class="app-footer">
-            <img src="{% static 'LogoAppGym.png' %}" alt="Logo Center GYM">
-        </div>
-    </div>
+    <footer class="app-footer">
+        <img src="{% static 'LogoAppGym.png' %}" alt="Logo Center GYM">
+    </footer>
 </body>
 </html>

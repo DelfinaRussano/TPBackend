@@ -1,7 +1,10 @@
 __pycache__/
 *.pyc
-*.pyo
-*.pyd
-.env
 venv/
+env/
+Env/
 db.sqlite3
+db.sqlite3.local-backup-before-github-pull
+server.log
+server.err
+.env
