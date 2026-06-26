@@ -96,6 +96,12 @@
                                                          data-dni="{{ alumno.DNI }}"
                                                          data-montodeuda="{{ alumno.MontoDeuda }}"
                                                          data-clases="{% for clase in alumno.clases.all %}{{ clase.id }}{% if not forloop.last %},{% endif %}{% endfor %}">✏️</a>
+                                                     <form method="post" style="margin:0;">
+                                                         {% csrf_token %}
+                                                         <input type="hidden" name="action" value="eliminar_alumno">
+                                                         <input type="hidden" name="alumno_id" value="{{ alumno.id }}">
+                                                         <button type="submit" class="btn delete" title="Eliminar">×</button>
+                                                     </form>
                                     </td>
                                 </tr>
                             {% empty %}
@@ -167,6 +173,12 @@
                                            data-nombre="{{ clase.nombre }}"
                                            data-dias="{{ clase.dias }}"
                                            data-horario="{{ clase.horario }}">✏️</a>
+                                        <form method="post" style="margin:0;">
+                                            {% csrf_token %}
+                                            <input type="hidden" name="action" value="eliminar_clase">
+                                            <input type="hidden" name="clase_id" value="{{ clase.id }}">
+                                            <button type="submit" class="btn delete" title="Eliminar">×</button>
+                                        </form>
                                     </td>
                                 </tr>
                             {% empty %}
@@ -221,6 +233,12 @@
                                            data-nombre="{{ profesor.nombre }}"
                                            data-apellido="{{ profesor.apellido }}"
                                            data-clases="{% for c in profesor.clases.all %}{{ c.id }}{% if not forloop.last %},{% endif %}{% endfor %}">✏️</a>
+                                        <form method="post" style="margin:0;">
+                                            {% csrf_token %}
+                                            <input type="hidden" name="action" value="eliminar_profesor">
+                                            <input type="hidden" name="profesor_id" value="{{ profesor.id }}">
+                                            <button type="submit" class="btn delete" title="Eliminar">×</button>
+                                        </form>
                                     </td>
                                 </tr>
                             {% empty %}
@@ -271,6 +289,12 @@
                                            data-precio="{{ plan.precio }}"
                                            data-duracion="{{ plan.duracion }}"
                                            data-descripcion="{{ plan.descripcion }}">✏️</a>
+                                        <form method="post" style="margin:0;">
+                                            {% csrf_token %}
+                                            <input type="hidden" name="action" value="eliminar_plan">
+                                            <input type="hidden" name="plan_id" value="{{ plan.id }}">
+                                            <button type="submit" class="btn delete" title="Eliminar">×</button>
+                                        </form>
                                     </td>
                                 </tr>
                             {% empty %}
@@ -303,7 +327,12 @@
                         </thead>
                         <tbody>
                             {% for reclamo in reclamos %}
-                                    <tr>
+                                    <tr class="clickable-row" data-view-type="reclamo"
+                                        data-alumno="{{ reclamo.alumno }}"
+                                        data-estado="{{ reclamo.estado }}"
+                                        data-fecha="{{ reclamo.fecha_reclamo|date:'d/m/Y H:i' }}"
+                                        data-fecha-resolucion="{% if reclamo.fecha_resolucion %}{{ reclamo.fecha_resolucion|date:'d/m/Y H:i' }}{% else %}-{% endif %}"
+                                        data-contenido="{{ reclamo.contenido|escapejs }}">
                                         <td>{{ reclamo.alumno }}</td>
                                         <td>
                                             <form method="post" class="inline-form" action="">
@@ -706,6 +735,14 @@
                     { label: 'Precio', value: '$' + row.dataset.precio },
                     { label: 'Duración', value: row.dataset.duracion },
                     { label: 'Descripción', value: row.dataset.descripcion || '-' },
+                ]);
+            } else if (type === 'reclamo') {
+                showDetailModal('Detalle de Reclamo', [
+                    { label: 'Alumno', value: row.dataset.alumno },
+                    { label: 'Estado', value: row.dataset.estado },
+                    { label: 'Fecha de reclamo', value: row.dataset.fecha },
+                    { label: 'Fecha de resolución', value: row.dataset.fechaResolucion || '-' },
+                    { label: 'Contenido', value: row.dataset.contenido || '-' },
                 ]);
             } else if (type === 'alumno') {
                 const clases = row.dataset.clases ? row.dataset.clases.split('|||').filter(Boolean) : [];

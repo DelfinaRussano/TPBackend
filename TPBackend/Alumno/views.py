@@ -222,6 +222,40 @@ def admin_panel(request):
                 messages.success(request, f'Clase "{nombre}" eliminada correctamente.')
             return redirect(f"{request.path}?tab=clases")
 
+        elif action == 'eliminar_alumno':
+            active_tab = 'clientes'
+            alumno_id = request.POST.get('alumno_id')
+            if alumno_id:
+                alumno = get_object_or_404(Alumno, pk=alumno_id)
+                nombre = f"{alumno.nombre} {alumno.apellido}"
+                if hasattr(alumno, 'usuario') and alumno.usuario:
+                    alumno.usuario.delete()
+                alumno.delete()
+                messages.success(request, f'Cliente "{nombre}" eliminado correctamente.')
+            return redirect(f"{request.path}?tab=clientes")
+
+        elif action == 'eliminar_profesor':
+            active_tab = 'profesores'
+            profesor_id = request.POST.get('profesor_id')
+            if profesor_id:
+                profesor = get_object_or_404(Profesor, pk=profesor_id)
+                nombre = f"{profesor.nombre} {profesor.apellido}"
+                if hasattr(profesor, 'usuario') and profesor.usuario:
+                    profesor.usuario.delete()
+                profesor.delete()
+                messages.success(request, f'Profesor "{nombre}" eliminado correctamente.')
+            return redirect(f"{request.path}?tab=profesores")
+
+        elif action == 'eliminar_plan':
+            active_tab = 'planes'
+            plan_id = request.POST.get('plan_id')
+            if plan_id:
+                plan = get_object_or_404(Plan, pk=plan_id)
+                nombre = plan.nombre
+                plan.delete()
+                messages.success(request, f'Plan "{nombre}" eliminado correctamente.')
+            return redirect(f"{request.path}?tab=planes")
+
         elif action in ('crear_profesor', 'editar_profesor'):
             active_tab = 'profesores'
             show_profesor_form = True
@@ -409,13 +443,15 @@ def editar_perfil(request, alumno_id):
             nueva = request.POST.get('password_nueva')
             confirmar = request.POST.get('password_confirmar')
 
-            if nueva != confirmar:
+            if not actual or not request.user.check_password(actual):
+                messages.error(request, 'La contraseña actual es incorrecta.')
+            elif nueva != confirmar:
                 messages.error(request, 'Las contraseñas nuevas no coinciden.')
             elif len(nueva) < 8:
                 messages.error(request, 'La contraseña debe tener al menos 8 caracteres.')
             else:
-                alumno.user.set_password(nueva)
-                alumno.user.save()
+                request.user.set_password(nueva)
+                request.user.save()
                 messages.success(request, 'Contraseña cambiada correctamente.')
 
     return render(request, 'editar_perfil.html', {

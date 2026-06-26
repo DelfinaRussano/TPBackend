@@ -308,7 +308,7 @@ main.page-content {
 	display: none;
 	align-items: center;
 	justify-content: center;
-	z-index: 200;
+	z-index: 100;
 }
 
 .modal-content {
@@ -617,7 +617,7 @@ tbody tr:hover {
 	align-items: center;
 	flex-wrap: wrap;
 	padding: 18px 24px;
-	background: #111111;
+	background: #111;
 	gap: 18px;
 }
 
@@ -626,7 +626,7 @@ tbody tr:hover {
 	bottom: 0;
 	left: 0;
 	width: 100%;
-	background: #111111;
+	background: #111;
 	text-align: left;
 	padding: 14px 24px;
 	box-shadow: 0 -2px 8px rgba(0, 0, 0, 0.08);
@@ -634,9 +634,7 @@ tbody tr:hover {
 }
 
 .container {
-	padding: 24px 24px 120px;
-	max-width: 1180px;
-	margin: 0 auto;
+	padding-bottom: 120px;
 }
 
 .app-footer img {
