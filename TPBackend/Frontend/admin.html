@@ -51,12 +51,11 @@
         <section class="tab-panel{% if active_tab == 'clientes' %} active{% endif %}" id="clientes">
             <section class="page-header">
                 <h1>CLIENTES</h1>
-                <a href="{% url 'alumno:crear_alumno' %}" class="btn btn-primary">+ Nuevo Cliente</a>
+                <button type="button" id="toggleAlumnoFormBtn" class="btn btn-primary">+ Nuevo Cliente</button>
             </section>
             <section class="card">
                 <div class="card-controls">
                     <form method="get" class="search" action="">
-                        <span class="search-icon">🔍</span>
                         <input type="text" name="q" placeholder="Buscar por nombre, email o DNI..." value="{{ q_alumnos }}">
                         <button type="submit" class="btn">Buscar</button>
                     </form>
@@ -659,7 +658,7 @@
 
         initEntityForm({
             modalId: 'alumnoFormModal',
-            toggleBtnId: '',
+            toggleBtnId: 'toggleAlumnoFormBtn',
             cancelBtnId: 'cancelAlumnoFormBtn',
             formId: 'alumnoForm',
             actionInputId: 'alumno-action',

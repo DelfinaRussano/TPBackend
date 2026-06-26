@@ -20,7 +20,7 @@
             <a href="{% url 'alumno:dashboard' alumno.id %}">Mi Panel</a>
             <a href="{% url 'alumno:mis_clases' alumno.id %}" class="active">Mis Clases</a>
             <a href="{% url 'alumno:mis_reclamos' alumno.id %}">Mis Reclamos</a>
-            <a href="{% url 'alumno:crear_reclamo' alumno.id %}">Nuevo Reclamo</a>
+            <a href="{% url 'alumno:editar_perfil' alumno.id %}">Mi Perfil</a>
             <a href="{% url 'accounts:logout' %}" class="logout-link">Cerrar</a>
         </div>
     </div>
@@ -83,9 +83,19 @@
 
         </div>
 
-        <div class="app-footer">
-            <img src="{% static 'LogoAppGym.png' %}" alt="Logo Center GYM">
-        </div>
+        <footer class="app-footer sticky-footer">
+            <div class="footer-left">
+                <img src="{% static 'LogoAppGym.png' %}" alt="Logo Center GYM">
+                <div class="footer-text">
+                    <div class="footer-title">TP Final Back End</div>
+                    <div class="footer-note">© 2026 TP Final Back End</div>
+                </div>
+            </div>
+            <div class="footer-contact">
+                <div>Contactanos</div>
+                <div>info@centergym.com • +54 9 11 1234 5678</div>
+            </div>
+        </footer>
     </div>
 </body>
 </html>

@@ -20,7 +20,7 @@
             <a href="{% url 'alumno:dashboard' alumno.id %}">Mi Panel</a>
             <a href="{% url 'alumno:mis_clases' alumno.id %}">Mis Clases</a>
             <a href="{% url 'alumno:mis_reclamos' alumno.id %}" class="active">Mis Reclamos</a>
-            <a href="{% url 'alumno:crear_reclamo' alumno.id %}">Nuevo Reclamo</a>
+            <a href="{% url 'alumno:editar_perfil' alumno.id %}">Mi Perfil</a>
             <a href="{% url 'accounts:logout' %}" class="logout-link">Cerrar</a>
         </div>
     </div>
@@ -29,7 +29,7 @@
         <div class="card">
             <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px">
                 <h2>MIS RECLAMOS</h2>
-                <a class="btn" href="{% url 'alumno:crear_reclamo' alumno.id %}" style="background:#ff8a00; color:#fff;text-decoration: none;">+ Nuevo Reclamo</a>
+                <a class="btn" id="openReclamoModal" href="{% url 'alumno:crear_reclamo' alumno.id %}" style="background:#ff8a00; color:#fff; text-decoration: none;">+ Nuevo Reclamo</a>
             </div>
 
             <div style="margin-bottom:12px;">
@@ -77,9 +77,60 @@
 
         </div>
 
-        <div class="app-footer">
-            <img src="{% static 'LogoAppGym.png' %}" alt="Logo Center GYM">
+        <div id="reclamoModal" class="modal form-modal" onclick="cerrarModalSiFondo(event)">
+            <div class="modal-content">
+                <h2 class="modal-title">Nuevo Reclamo</h2>
+                <form method="POST" action="{% url 'alumno:crear_reclamo' alumno.id %}">
+                    {% csrf_token %}
+                    <div style="margin-bottom:20px; text-align:left;">
+                        <label for="modal-contenido" style="display:block; margin-bottom:8px; font-weight:600; color:#111;">Descripción del reclamo</label>
+                        <textarea id="modal-contenido" name="contenido" rows="6" required placeholder="Contanos qué sucedió..." style="width:100%; padding:14px; border:1px solid #ddd; border-radius:10px; font-family:inherit; font-size:14px; resize:vertical;"></textarea>
+                    </div>
+                    <div class="form-actions" style="display:flex; gap:12px; justify-content:center; flex-wrap:wrap;">
+                        <button type="submit" class="btn btn-primary">Enviar Reclamo</button>
+                        <button type="button" class="btn btn-secondary" onclick="cerrarModal()">Cancelar</button>
+                    </div>
+                </form>
+            </div>
         </div>
+
+        <script>
+            const reclamoModal = document.getElementById('reclamoModal');
+            const openReclamoBtn = document.getElementById('openReclamoModal');
+            if (openReclamoBtn) {
+                openReclamoBtn.addEventListener('click', function(event) {
+                    event.preventDefault();
+                    reclamoModal.style.display = 'flex';
+                });
+            }
+            function cerrarModal() {
+                reclamoModal.style.display = 'none';
+            }
+            function cerrarModalSiFondo(event) {
+                if (event.target === reclamoModal) {
+                    cerrarModal();
+                }
+            }
+            document.addEventListener('keydown', function(e) {
+                if (e.key === 'Escape' && reclamoModal.style.display === 'flex') {
+                    cerrarModal();
+                }
+            });
+        </script>
+
+        <footer class="app-footer sticky-footer">
+            <div class="footer-left">
+                <img src="{% static 'LogoAppGym.png' %}" alt="Logo Center GYM">
+                <div class="footer-text">
+                    <div class="footer-title">TP Final Back End</div>
+                    <div class="footer-note">© 2026 TP Final Back End</div>
+                </div>
+            </div>
+            <div class="footer-contact">
+                <div>Contactanos</div>
+                <div>info@centergym.com • +54 9 11 1234 5678</div>
+            </div>
+        </footer>
     </div>
 </body>
 </html>

@@ -99,3 +99,37 @@ def crear_profesor(request):
     clases = Clase.objects.all()
     return render(request, 'crear_profesor.html', {'clases': clases})
 
+@login_required(login_url='home')
+@profesor_required
+def editar_perfil(request, profesor_id):
+    profesor = get_object_or_404(Profesor, id=profesor_id)
+
+    if request.method == 'POST':
+        action = request.POST.get('action')
+
+        if action == 'actualizar_datos':
+            profesor.nombre = request.POST.get('nombre', profesor.nombre)
+            profesor.apellido = request.POST.get('apellido', profesor.apellido)
+            profesor.save()
+            messages.success(request, 'Datos actualizados correctamente.')
+
+        elif action == 'cambiar_password':
+            nueva = request.POST.get('password_nueva')
+            confirmar = request.POST.get('password_confirmar')
+
+            if nueva != confirmar:
+                messages.error(request, 'Las contraseñas nuevas no coinciden.')
+            elif len(nueva) < 8:
+                messages.error(request, 'La contraseña debe tener al menos 8 caracteres.')
+            else:
+                if hasattr(profesor, 'usuario') and profesor.usuario:
+                    profesor.usuario.set_password(nueva)
+                    profesor.usuario.save()
+                    messages.success(request, 'Contraseña cambiada correctamente.')
+                else:
+                    messages.error(request, 'No se encontró el usuario asociado al profesor.')
+
+    return render(request, 'editar_perfil.html', {
+        'usuario': profesor,
+        'tipo': 'profesor',
+    })

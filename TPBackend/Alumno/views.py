@@ -390,3 +390,35 @@ def crear_reclamo(request, alumno_id):
             messages.error(request, 'el contenido del reclamo no puede estar vacio.')
 
     return render(request, 'crear_reclamo.html', {'alumno': alumno})
+
+
+def editar_perfil(request, alumno_id):
+    alumno = get_object_or_404(Alumno, id=alumno_id)
+
+    if request.method == 'POST':
+        action = request.POST.get('action')
+
+        if action == 'actualizar_datos':
+            alumno.nombre = request.POST.get('nombre', alumno.nombre)
+            alumno.apellido = request.POST.get('apellido', alumno.apellido)
+            alumno.save()
+            messages.success(request, 'Datos actualizados correctamente.')
+
+        elif action == 'cambiar_password':
+            actual = request.POST.get('password_actual')
+            nueva = request.POST.get('password_nueva')
+            confirmar = request.POST.get('password_confirmar')
+
+            if nueva != confirmar:
+                messages.error(request, 'Las contraseñas nuevas no coinciden.')
+            elif len(nueva) < 8:
+                messages.error(request, 'La contraseña debe tener al menos 8 caracteres.')
+            else:
+                alumno.user.set_password(nueva)
+                alumno.user.save()
+                messages.success(request, 'Contraseña cambiada correctamente.')
+
+    return render(request, 'editar_perfil.html', {
+        'usuario': alumno,
+        'tipo': 'alumno',
+    })
