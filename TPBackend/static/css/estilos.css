@@ -634,7 +634,9 @@ tbody tr:hover {
 }
 
 .container {
-	padding-bottom: 120px;
+	max-width: 1180px;
+	margin: 24px auto 0;
+	padding: 0 24px 120px;
 }
 
 .app-footer img {

@@ -110,7 +110,7 @@ def admin_panel(request):
     if request.method == 'POST':
         action = request.POST.get('action', '')
 
-        if action == 'editar_alumno':
+        if action in ('crear_alumno', 'editar_alumno'):
             active_tab = 'clientes'
             show_alumno_form = True
             alumno_edit_id = request.POST.get('alumno_id') or None
@@ -136,7 +136,7 @@ def admin_panel(request):
                 except ValueError:
                     messages.error(request, 'DNI y deuda deben ser números válidos.')
                 else:
-                    if alumno_edit_id:
+                    if action == 'editar_alumno' and alumno_edit_id:
                         alumno = get_object_or_404(Alumno, pk=alumno_edit_id)
                         alumno.nombre = nombre
                         alumno.apellido = apellido
@@ -146,6 +146,38 @@ def admin_panel(request):
                         alumno.clases.set(alumno_form['clases_ids'])
                         messages.success(request, 'Cliente actualizado correctamente.')
                         return redirect(f"{request.path}?tab=clientes")
+                    else:
+                        try:
+                            with transaction.atomic():
+                                alumno = Alumno.objects.create(
+                                    nombre=nombre,
+                                    apellido=apellido,
+                                    DNI=dni_int,
+                                    MontoDeuda=monto_deuda_decimal,
+                                )
+                                alumno.clases.set(alumno_form['clases_ids'])
+
+                                email = generate_unique_email(nombre, apellido)
+                                usuario = User.objects.create_user(
+                                    email=email,
+                                    password='alumno',
+                                    role=User.ALUMNO,
+                                    first_name=nombre,
+                                    last_name=apellido,
+                                )
+                                usuario.alumno = alumno
+                                usuario.save()
+
+                            messages.success(
+                                request,
+                                f'Cliente creado correctamente. Email: {email} / Contraseña inicial: alumno'
+                            )
+                            return redirect(f"{request.path}?tab=clientes")
+                        except Exception as exc:
+                            messages.error(request, 'Error al crear el cliente. Por favor revise los datos e intente nuevamente.')
+                            form_errors = str(exc)
+                            if form_errors:
+                                messages.error(request, form_errors)
 
         elif action in ('crear_plan', 'editar_plan'):
             active_tab = 'planes'
