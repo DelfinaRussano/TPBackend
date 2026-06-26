@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Center GYM - Mi Panel</title>
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'css/estilos.css' %}">
+    <style>
+    .logout-link {
+        color: #ff8a00 !important;
+        font-weight: 700;
+    }
+</style>
+</head>
+<body>
+    <div class="topbar">
+        <div class="brand">CENTER GYM</div>
+        <div class="nav">
+            <a href="{% url 'alumno:dashboard' %}" class="active">Mi Panel</a>
+            <a href="{% url 'alumno:mis_clases' %}">Mis Clases</a>
+            <a href="{% url 'alumno:mis_reclamos' %}">Mis Reclamos</a>
+            <a href="{% url 'alumno:editar_perfil' %}">Mi Perfil</a>
+            <a href="{% url 'accounts:logout' %}" class="logout-link">Cerrar</a>
+        </div>
+    </div>
+
+    <div class="container">
+        <div class="page-header">
+            <div>
+                <h1>¡Bienvenid@, {{ alumno.nombre }}!</h1>
+                <p>Resumen de tu actividad en Center GYM.</p>
+            </div>
+        </div>
+
+        <div class="dashboard-grid">
+            <div class="stat-card">
+                <div class="stat-card-title">Clases asignadas</div>
+                <div class="stat-card-value">{{ total_clases }}</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-card-title">Reclamos enviados</div>
+                <div class="stat-card-value">{{ total_reclamos }}</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-card-title">Ingresos al gimnasio</div>
+                <div class="stat-card-value">{{ alumno.Ingresos }}</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-card-title">Deuda actual</div>
+                <div class="stat-card-value">${{ alumno.MontoDeuda }}</div>
+            </div>
+        </div>
+
+        <footer class="app-footer sticky-footer">
+            <div class="footer-left">
+                <img src="{% static 'LogoAppGym.png' %}" alt="Logo Center GYM">
+                <div class="footer-text">
+                    <div class="footer-title">TP Final Back End</div>
+                    <div class="footer-note">© 2026 TP Final Back End</div>
+                </div>
+            </div>
+            <div class="footer-contact">
+                <div>Contactanos</div>
+                <div>info@centergym.com • +54 9 11 1234 5678</div>
+            </div>
+        </footer>
+    </div>
+</body>
+</html>
