@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Center GYM - Mis Clases</title>
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'css/estilos.css' %}">
+    <style>
+    .logout-link {
+        color: #ff8a00 !important;
+        font-weight: 700;
+    }
+</style>
+</head>
+<body>
+    <div class="topbar">
+        <div class="brand">CENTER GYM</div>
+        <div class="nav">
+            <a href="{% url 'alumno:dashboard' alumno.id %}">Mi Panel</a>
+            <a href="{% url 'alumno:mis_clases' alumno.id %}" class="active">Mis Clases</a>
+            <a href="{% url 'alumno:mis_reclamos' alumno.id %}">Mis Reclamos</a>
+            <a href="{% url 'alumno:crear_reclamo' alumno.id %}">Nuevo Reclamo</a>
+            <a href="{% url 'accounts:logout' %}" class="logout-link">Cerrar</a>
+        </div>
+    </div>
+
+    <div class="container">
+        <div class="card">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:18px">
+                <h2>MIS CLASES</h2>
+                <div class="muted">{{ clases|length }} clases asignadas</div>
+            </div>
+
+            <div class="controls">
+                <form method="POST" style="display:flex; gap:8px; align-items:center; margin-top:10px; flex-wrap:wrap;">
+                    {% csrf_token %}
+                    <input type="hidden" name="action" value="asociar_clase">
+                    <select name="clase_id" required style="padding:10px; border-radius:6px; border:1px solid #ccc; min-width:250px;">
+                        <option value="">Seleccioná una clase</option>
+                        {% for clase in clases_disponibles %}
+                            <option value="{{ clase.id }}">{{ clase.nombre }} — {{ clase.dias }} / {{ clase.horario }}</option>
+                        {% empty %}
+                            <option value="" disabled>No hay clases disponibles</option>
+                        {% endfor %}
+                    </select>
+                    <button type="submit" class="btn" style="background:#ff8a00; color:white; border:none; cursor:pointer;">Asociarme a la clase</button>
+                </form>
+            </div>
+
+            <table>
+                <thead>
+                    <tr>
+                        <th>NOMBRE</th>
+                        <th>DÍAS</th>
+                        <th>HORARIO</th>
+                        <th>ACCIONES</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for clase in clases %}
+                    <tr>
+                        <td><strong>{{ clase.nombre }}</strong></td>
+                        <td>{{ clase.dias }}</td>
+                        <td>{{ clase.horario }}</td>
+                        <td>
+                            <form method="POST" style="margin:0;">
+                                {% csrf_token %}
+                                <input type="hidden" name="action" value="desasociar_clase">
+                                <input type="hidden" name="clase_id" value="{{ clase.id }}">
+                                <button type="submit" class="btn" style="background:#ff4d4f; color:white; border:none; cursor:pointer; padding:8px 12px; border-radius:6px;">Eliminar clase</button>
+                            </form>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="4" style="text-align:center; color:#888; padding:40px;">No estás inscripto en ninguna clase.</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+
+
+        </div>
+
+        <div class="app-footer">
+            <img src="{% static 'LogoAppGym.png' %}" alt="Logo Center GYM">
+        </div>
+    </div>
+</body>
+</html>
