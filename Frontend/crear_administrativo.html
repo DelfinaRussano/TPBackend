@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Center GYM - Crear Administrativo</title>
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'css/estilos.css' %}">
+</head>
+<body>
+    <div class="topbar">
+        <div class="brand">CENTER GYM</div>
+        <div class="nav">
+            <a href="{% url 'admin_panel' %}">Panel Administrativo</a>
+            <a href="{% url 'accounts:logout' %}">Cerrar Sesión</a>
+        </div>
+    </div>
+
+    <div class="container">
+        <div class="card">
+            <h1>Crear Administrativo</h1>
+            <p style="color: #888; margin-bottom: 20px;">
+                El email se generará automáticamente: 
+                <strong>nombre.apellido@centergym.com</strong>
+            </p>
+
+            {% if messages %}
+                {% for message in messages %}
+                    <div style="background: #f8d7da; color: #721c24; padding: 12px; border-radius: 8px; margin-bottom: 15px;">
+                        {{ message }}
+                    </div>
+                {% endfor %}
+            {% endif %}
+
+            <form method="POST">
+                {% csrf_token %}
+                <div class="form-group">
+                    <label for="first_name">Nombre</label>
+                    <input type="text" id="first_name" name="first_name" 
+                           value="{{ first_name|default:'' }}" required 
+                           placeholder="Nombre del administrativo">
+                </div>
+                <div class="form-group">
+                    <label for="last_name">Apellido</label>
+                    <input type="text" id="last_name" name="last_name" 
+                           value="{{ last_name|default:'' }}" required 
+                           placeholder="Apellido del administrativo">
+                </div>
+                <div class="form-group">
+                    <label for="password">Contraseña</label>
+                    <input type="password" id="password" name="password" required>
+                    <small style="color: #888;">Mínimo 8 caracteres.</small>
+                </div>
+                <div style="display: flex; gap: 12px; margin-top: 20px;">
+                    <button type="submit" class="btn btn-primary">Crear Administrativo</button>
+                    <a href="{% url 'admin_panel' %}" class="btn btn-secondary">Cancelar</a>
+                </div>
+            </form>
+        </div>
+    </div>
+</body>
+</html>

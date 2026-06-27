@@ -1,15 +1,11 @@
-from django.shortcuts import render, redirect
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
+from django.shortcuts import render, redirect
 from django.contrib import messages
 from django.contrib.auth import get_user_model
 from accounts.utils import generate_unique_email
 
 User = get_user_model()
-
-
-def index(request):
-    return render(request, 'index.html')
 
 
 def login_view(request):
